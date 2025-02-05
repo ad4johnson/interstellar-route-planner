@@ -1,0 +1,39 @@
+{
+  "family": "interstellar-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::597088035840:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "interstellar-api",
+      "image": "597088035840.dkr.ecr.us-east-1.amazonaws.com/interstellar-api:latest",
+      "cpu": 256,
+      "memory": 512,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "DB_HOST", "value": "postgres-service" },
+        { "name": "DB_PORT", "value": "5432" },
+        { "name": "DB_USER", "value": "admin" },
+        { "name": "DB_PASSWORD", "value": "password" },
+        { "name": "DB_NAME", "value": "interstellar" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/interstellar-service",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
