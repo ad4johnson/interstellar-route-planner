@@ -22,13 +22,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest  # Install pytest for testing
+          pip install pytest requests  # ✅ Ensure 'requests' is installed
 
       - name: Debug Directory Contents
-        run: ls -R  # List all files to verify the test file location
+        run: ls -R  # List all files to verify test file location
 
       - name: Run tests
-        run: pytest tests/test_api.py  # Ensure the correct path is used
+        run: pytest tests/test_api.py  # Ensure correct test path
 
       - name: Debug Secrets
         run: |
