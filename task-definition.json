@@ -15,6 +15,13 @@
           "hostPort": 8000
         }
       ],
+      "environment": [
+        { "name": "DB_HOST", "value": "postgres-service" },
+        { "name": "DB_PORT", "value": "5432" },
+        { "name": "DB_USER", "value": "admin" },
+        { "name": "DB_PASSWORD", "value": "securepassword" },
+        { "name": "DB_NAME", "value": "interstellar_db" }
+      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
