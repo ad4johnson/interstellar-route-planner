@@ -24,8 +24,11 @@ jobs:
           pip install -r requirements.txt
           pip install pytest  # Install pytest for testing
 
+      - name: Debug Directory Contents
+        run: ls -R  # List all files to verify the test file location
+
       - name: Run tests
-        run: pytest test_api.py  # Run API tests
+        run: pytest tests/test_api.py  # Ensure the correct path is used
 
       - name: Debug Secrets
         run: |
@@ -52,13 +55,6 @@ jobs:
           context: .
           push: true
           tags: ad4johnson/interstellar-route-planner:latest
-      
-      - name: Debug Directory Contents
-          run: ls -R
-  
-      - name: Run tests
-          run: pytest tests/test_api.py  # Ensure the correct path is used
-  
 
       - name: Set up Kubernetes CLI
         uses: azure/setup-kubectl@v3
