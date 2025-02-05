@@ -52,6 +52,13 @@ jobs:
           context: .
           push: true
           tags: ad4johnson/interstellar-route-planner:latest
+      
+      - name: Debug Directory Contents
+          run: ls -R
+  
+      - name: Run tests
+          run: pytest tests/test_api.py  # Ensure the correct path is used
+  
 
       - name: Set up Kubernetes CLI
         uses: azure/setup-kubectl@v3
