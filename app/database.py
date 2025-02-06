@@ -14,6 +14,7 @@ db_config = {
     "port": os.getenv("DB_PORT", "5432"),
 }
 
+
 def get_db_connection():
     """Establishes a database connection and returns a cursor."""
     try:
@@ -21,6 +22,7 @@ def get_db_connection():
         return conn
     except Exception as e:
         raise RuntimeError(f"Database connection failed: {str(e)}")
+
 
 def get_gates_from_db():
     try:
@@ -34,14 +36,19 @@ def get_gates_from_db():
         gates = {}
         for row in rows:
             gate_id, name, connections = row
-            connections = json.loads(connections) if isinstance(connections, str) else connections
+            connections = (
+                json.loads(connections) if isinstance(connections, str) else connections
+            )
             gates[gate_id] = {
                 "name": name,
-                "connections": {c["id"]: int(c["hu"]) for c in connections}  # Convert to adjacency list format
+                "connections": {
+                    c["id"]: int(c["hu"]) for c in connections
+                },  # Convert to adjacency list format
             }
         return gates
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 
 @app.get("/gates")
 def get_gates():
@@ -50,6 +57,6 @@ def get_gates():
         gates = get_gates_from_db()
         if not gates:
             return {"error": "No gates found in database"}
-        return {"gates": [{"id": k, "name": v['name']} for k, v in gates.items()]}
+        return {"gates": [{"id": k, "name": v["name"]} for k, v in gates.items()]}
     except Exception as e:
         return {"error": f"Database error: {str(e)}"}

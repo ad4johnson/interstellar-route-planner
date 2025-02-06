@@ -11,6 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
+    command: ["postgres", "-c", "ALTER USER postgres WITH PASSWORD 'Interstellar';"]
 
   app:
     build: .
