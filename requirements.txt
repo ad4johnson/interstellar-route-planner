@@ -3,4 +3,3 @@ uvicorn
 psycopg2-binary
 python-dotenv
 pytest
-asyncio_mode = auto
