@@ -52,7 +52,7 @@ jobs:
               exit 0
             fi
             echo "⏳ Waiting for API to start..."
-            sleep 3
+            sleep 7
           done
           echo "❌ API failed to start!"
           exit 1
