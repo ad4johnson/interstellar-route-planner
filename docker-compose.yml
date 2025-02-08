@@ -1,32 +1,27 @@
 services:
   postgres:
-    image: postgres:latest
-    container_name: postgres
+    image: postgres:15
+    container_name: interstellar-postgres
+    restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: securepassword
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: London25
       POSTGRES_DB: interstellar_db
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: always
-    command: ["postgres", "-c", "ALTER USER postgres WITH PASSWORD 'Interstellar';"]
 
   app:
     build: .
-    container_name: interstellar-app
     depends_on:
       - postgres
     environment:
-      DB_NAME: interstellar_db
-      DB_USER: admin
-      DB_PASSWORD: securepassword
-      DB_HOST: postgres  # Matches the container name
-      DB_PORT: 5432
+      DATABASE_URL: postgresql://myuser:London25@postgres:5432/interstellar_db
     ports:
-      - "8100:8000"
-    restart: always
+      - "8000:8000"
+    volumes:
+      - .:/app
 
 volumes:
   postgres_data:

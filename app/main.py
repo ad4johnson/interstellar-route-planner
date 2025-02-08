@@ -4,14 +4,18 @@ import psycopg2
 import json
 from dotenv import load_dotenv
 from psycopg2 import OperationalError
-
-# from app.routes import router
+import sys
+sys.path.append("/app/")
 from app.utils import dijkstra
+
 
 load_dotenv()
 app = FastAPI()
 router = APIRouter()
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 @router.get("/routes")
 async def get_routes():
