@@ -15,6 +15,7 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   })
 }
 
+
 resource "aws_iam_policy" "ecs_task_policy" {
   name        = "ecsTaskPolicy"
   description = "Policy for ECS task execution role"
