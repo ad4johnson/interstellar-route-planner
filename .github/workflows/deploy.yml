@@ -1,18 +1,18 @@
-name: Deploy to AWS ECS
+name: Deploy
 
 on:
   push:
     branches:
-      - main  
+      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
-    name: Deploy to AWS ECS
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
