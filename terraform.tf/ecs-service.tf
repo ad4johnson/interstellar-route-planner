@@ -1,13 +1,13 @@
-# ECS Service (Fixed)
 resource "aws_ecs_service" "interstellar_service" {
   name            = "interstellar-service"
   cluster         = aws_ecs_cluster.interstellar_cluster.id
   task_definition = aws_ecs_task_definition.interstellar_task.arn
+  desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = ["subnet-00e47d9c39cfaeaf3", "subnet-04b4390b7d6e34c60"]
-    security_groups  = ["sg-07c8c59647ab697f1"]
+    subnets          = aws_subnet.interstellar_subnet[*].id
+    security_groups  = [aws_security_group.interstellar_sg.id]
     assign_public_ip = true
   }
 
@@ -16,4 +16,9 @@ resource "aws_ecs_service" "interstellar_service" {
     container_name   = "interstellar-container"
     container_port   = 80
   }
+
+  depends_on = [
+    aws_lb_listener.http,
+    aws_secretsmanager_secret_version.db_secrets_version
+  ]
 }
