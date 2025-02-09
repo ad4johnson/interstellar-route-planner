@@ -20,6 +20,28 @@ resource "aws_ecs_task_definition" "interstellar_task" {
           hostPort      = 80
         }
       ]
+      environment = [
+        {
+          name      = "DB_NAME"
+          valueFrom = "arn:aws:secretsmanager:us-east-1:123456789012:secret:mysecret:DB_NAME::"
+        },
+        {
+          name      = "DB_USER"
+          valueFrom = "arn:aws:secretsmanager:us-east-1:123456789012:secret:mysecret:DB_USER::"
+        },
+        {
+          name      = "DB_PASSWORD"
+          valueFrom = "arn:aws:secretsmanager:us-east-1:123456789012:secret:mysecret:DB_PASSWORD::"
+        },
+        {
+          name  = "DB_HOST"
+          value = "postgres-container"
+        },
+        {
+          name  = "DB_PORT"
+          value = "5432"
+        }
+      ]
     }
   ])
 }
@@ -49,16 +71,16 @@ resource "aws_ecs_task_definition" "postgres_task" {
       ]
       environment = [
         {
-          name  = "POSTGRES_DB"
-          value = "interstellar"
+          name      = "POSTGRES_DB"
+          valueFrom = "arn:aws:secretsmanager:us-east-1:123456789012:secret:mysecret:POSTGRES_DB::"
         },
         {
-          name  = "POSTGRES_USER"
-          value = "admin"
+          name      = "POSTGRES_USER"
+          valueFrom = "arn:aws:secretsmanager:us-east-1:123456789012:secret:mysecret:POSTGRES_USER::"
         },
         {
-          name  = "POSTGRES_PASSWORD"
-          value = "London25"
+          name      = "POSTGRES_PASSWORD"
+          valueFrom = "arn:aws:secretsmanager:us-east-1:123456789012:secret:mysecret:POSTGRES_PASSWORD::"
         }
       ]
       logConfiguration = {
