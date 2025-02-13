@@ -17,3 +17,5 @@ terraform.tfstate.backup
 .env
 venv/
 
+.env
+.env
