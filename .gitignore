@@ -1,4 +1,3 @@
-
 # Ignore Python cache
 __pycache__/
 *.pyc
@@ -8,14 +7,40 @@ __pycache__/
 # Ignore system files
 .DS_Store
 
-# Ignore Terraform state files
+# Ignore Terraform state files and working directory
 terraform.tfstate
 terraform.tfstate.backup
 .terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+*.tfvars
+override.tf
+override.tf.json
+.terraform.lock.hcl
 
-# Ignore environment files
+# Ignore environment and virtual environment files
 .env
+.venv/
 venv/
+.env.local
+.envrc
 
-.env
-.env
+# Ignore Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Ignore logs
+log/
+*.log
+logfile
+
+# Ignore migrations (if using Django/Flask)
+migrations/
+
+# Ignore Docker-related files
+docker-compose.override.yml
+
+# Ignore policy JSONs if generated dynamically
+policy.json
