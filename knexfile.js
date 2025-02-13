@@ -4,10 +4,10 @@ module.exports = {
   development: {
     client: 'pg',
     connection: {
-      host: process.env.DB_HOST || '127.0.0.1',  // Use the DB_HOST from .env
-      user: process.env.DB_USER || 'admin',
-      password: process.env.DB_PASSWORD || 'securepassword',
-      database: process.env.DB_NAME || 'interstellar_db',
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       port: process.env.DB_PORT || 5432
     },
     migrations: {
