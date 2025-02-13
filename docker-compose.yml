@@ -4,22 +4,35 @@ services:
     container_name: interstellar-postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: London25
-      POSTGRES_DB: interstellar_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 10s
+      retries: 5
 
   app:
     build: .
+    container_name: interstellar-route-planner-app
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://myuser:London25@postgres:5432/interstellar_db
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DATABASE_URL: ${DATABASE_URL}
     ports:
       - "8000:8000"
+    command: >
+      sh -c "until pg_isready -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER}; do sleep 5; done && npx knex migrate:latest && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     volumes:
       - .:/app
 
