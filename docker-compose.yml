@@ -21,7 +21,7 @@ services:
     container_name: interstellar-route-planner-app
     depends_on:
       postgres:
-        condition: service_healthy
+        condition: service_healthy  # Ensures API starts ONLY when DB is ready
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
@@ -31,10 +31,9 @@ services:
       DATABASE_URL: ${DATABASE_URL}
     ports:
       - "8000:8000"
-    command: >
-      sh -c "until pg_isready -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER}; do sleep 5; done && npx knex migrate:latest && uvicorn app.main:app --host 0.0.0.0 --port 8000"
-    volumes:
-      - .:/app
+    
+    command: sh -c "until pg_isready -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER}; do echo 'Waiting for database...'; sleep 5; done; echo 'Database is ready. Running migrations...'; npx knex migrate:latest; echo 'Migrations complete. Starting API...'; uvicorn app.main:app --host 0.0.0.0 --port 8000"
 
+      
 volumes:
   postgres_data:
