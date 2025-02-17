@@ -2,15 +2,15 @@ resource "aws_lb" "interstellar_alb" {
   name               = "interstellar-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = ["sg-07c8c59647ab697f1"]
-  subnets            = ["subnet-00e47d9c39cfaeaf3", "subnet-04b4390b7d6e34c60"]
+  security_groups    = ["sg-0a6fa3f01fa5e9ad0"]
+  subnets            = ["subnet-05e7dc0bf11f2bc06", "subnet-08595d9184fb831c5"]
 }
 
 resource "aws_lb_target_group" "interstellar_tg" {
   name        = "interstellar-tg"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = "vpc-0c58473b204cc096c"
+  vpc_id      = "vpc-0ebf59b186a59f2bc"
   target_type = "ip"
 
   health_check {

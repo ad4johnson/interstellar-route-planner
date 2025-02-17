@@ -2,12 +2,12 @@ resource "aws_ecs_service" "interstellar_service" {
   name            = "interstellar-service"
   cluster         = aws_ecs_cluster.interstellar_cluster.id
   task_definition = aws_ecs_task_definition.interstellar_task.arn
-  desired_count   = 1
+  desired_count   = 2
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = aws_subnet.interstellar_subnet[*].id
-    security_groups  = [aws_security_group.interstellar_sg.id]
+    subnets          = var.public_subnet_ids
+    security_groups  = [var.security_group_id]
     assign_public_ip = true
   }
 
@@ -17,8 +17,5 @@ resource "aws_ecs_service" "interstellar_service" {
     container_port   = 80
   }
 
-  depends_on = [
-    aws_lb_listener.http,
-    aws_secretsmanager_secret_version.db_secrets_version
-  ]
+  depends_on = [aws_lb.interstellar_alb] # Ensure Load Balancer is created first
 }
