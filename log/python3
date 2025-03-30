@@ -1,0 +1,24 @@
+import docker
+import json
+import psutil
+import socket
+
+def get_docker_info():
+    client = docker.from_env()
+    
+    # Get running containers
+    containers = []
+    for container in client.containers.list(all=True):
+        containers.append({
+            "name": container.name,
+            "id": container.id,
+            "image": container.image.tags,
+            "status": container.status,
+        })
+    
+    # Print container names
+    for container in containers:
+        print(f"Container Name: {container['name']}")
+
+if __name__ == "__main__":
+    get_docker_info()

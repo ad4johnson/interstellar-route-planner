@@ -19,5 +19,5 @@ RUN npm install -g npx knex
 # Expose the port your app runs on
 EXPOSE 8000
 
-# Run migrations and start the server
+# Ensure migrations are run before starting the app
 CMD ["sh", "-c", "npx knex migrate:latest && uvicorn app.main:app --host 0.0.0.0 --port 8000"]

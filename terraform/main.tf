@@ -1,24 +1,25 @@
+# Lookup existing VPC
 data "aws_vpc" "existing" {
-  id = "vpc-0ebf59b186a59f2bc" # Replace with your actual VPC ID
+  id = var.vpc_id
 }
 
+# Create a new subnet within the VPC
 resource "aws_subnet" "main" {
-  vpc_id                  = "vpc-0ebf59b186a59f2bc"
-  cidr_block              = "192.168.192.0/24" # Updated CIDR block
-  availability_zone       = "us-east-1a"
+  vpc_id                  = var.vpc_id
+  cidr_block              = var.subnet_cidr_block
+  availability_zone       = var.availability_zone
   map_public_ip_on_launch = true
 }
 
-resource "aws_instance" "web" {
-  ami           = "ami-01e3c4a339a264cc9"
-  instance_type = "t2.micro"
-  subnet_id     = aws_subnet.main.id
+# Create an ECS Cluster
+resource "aws_ecs_cluster" "main" {
+  name = var.ecs_cluster_name
 }
 
+# Create a VPC endpoint for S3
 resource "aws_vpc_endpoint" "example" {
   vpc_id       = data.aws_vpc.existing.id
-  service_name = "com.amazonaws.us-east-1.s3"
-
+  service_name = var.vpc_endpoint_service_name
   lifecycle {
     ignore_changes = [vpc_id]
   }
