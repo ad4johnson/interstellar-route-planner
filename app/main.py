@@ -7,20 +7,29 @@ from psycopg2 import OperationalError
 import sys
 sys.path.append("/app/")
 from app.utils import dijkstra
+from prometheus_fastapi_instrumentator import Instrumentator
+from fastapi import FastAPI, Request
 
 
 load_dotenv()
 app = FastAPI()
 router = APIRouter()
 
+@app.post("/api/data")
+async def receive_data(request: Request):
+    data = await request.json()
+    return {"received": data}
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
 
 @router.get("/routes")
 async def get_routes():
     return {"routes": ["Route1", "available"]}
 
+Instrumentator().instrument(app).expose(app)
 
 app.include_router(router, prefix="/api/v1")
 
@@ -39,6 +48,11 @@ except OperationalError as e:
 @app.get("/")
 def root():
     return {"message": "API is running!"}
+
+@app.post("/api/data")
+async def receive_data(request: Request):
+    data = await request.json()
+    return {"received": data}
 
 
 @app.get("/gates")
