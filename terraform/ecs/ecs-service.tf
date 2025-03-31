@@ -49,9 +49,7 @@ resource "aws_ecs_service" "example" {
 
 resource "aws_ecs_cluster" "main" {
   name       = "main-cluster"
-  depends_on = [aws_ecs_service.example]
-}
-
+  depends_on = [aws_ecs_service.exampl
 # ===========================
 # Data Source for Subnets
 # ===========================
