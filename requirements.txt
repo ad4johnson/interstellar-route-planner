@@ -2,5 +2,6 @@ fastapi
 uvicorn
 psycopg2-binary
 python-dotenv
-pytestprometheus-fastapi-instrumentator
+pytest
+prometheus-fastapi-instrumentator
 boto3
