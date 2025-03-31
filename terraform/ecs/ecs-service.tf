@@ -22,7 +22,7 @@ resource "aws_ecs_service" "interstellar_service" {
   name                 = "interstellar-service"
   cluster              = aws_ecs_cluster.interstellar_cluster.id
   task_definition      = aws_ecs_task_definition.interstellar_task.arn
-  desired_count        = 2
+  desired_count        = 1
   launch_type          = "FARGATE"
   force_new_deployment = false # Prevents unnecessary re-creation
 

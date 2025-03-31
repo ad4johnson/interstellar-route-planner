@@ -10,7 +10,11 @@ WORKDIR /app
 # Copy all project files
 COPY . /app
 
+# Upgrade pip
+RUN pip install --upgrade pip
+
 # Install Python dependencies
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Node.js dependencies globally

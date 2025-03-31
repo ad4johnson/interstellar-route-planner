@@ -1,25 +1,3 @@
-# Add your variable declarations here
-
-variable "s3_bucket_name" {
-  description = "The name of the S3 bucket"
-  type        = string
-}
-
-variable "aws_region" {
-  description = "The AWS region to deploy resources"
-  type        = string
-}
-
-variable "container_image" {
-  description = "The container image for the interstellar service"
-  type        = string
-}
-
-variable "db_port" {
-  description = "The database port for the interstellar service"
-  type        = number
-}
-
 # ===========================
 # PostgreSQL ECS Task Definition
 # ===========================

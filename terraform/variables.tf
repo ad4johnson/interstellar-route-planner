@@ -2,7 +2,7 @@
 # General Configuration
 # ===========================
 variable "aws_region" {
-  description = "The AWS region to deploy resources in"
+  description = "The AWS region where resources will be deployed"
   type        = string
   sensitive   = true
 }
@@ -95,7 +95,7 @@ variable "interstellar_image_version" {
 }
 
 variable "container_image" {
-  description = "The Docker image for the interstellar container"
+  description = "The container image for the Interstellar application"
   type        = string
   sensitive   = true
 }
@@ -125,10 +125,10 @@ variable "db_host" {
 }
 
 variable "db_port" {
-  description = "The port of the database"
+  description = "The port number for the database"
   type        = string
   sensitive   = true
-  default     = "5432"
+  default     = "5432"  # Default to PostgreSQL's standard port
 }
 
 variable "db_password" {
@@ -141,8 +141,14 @@ variable "db_password" {
 # ===========================
 # S3 Configuration
 # ===========================
-variable "s3_bucket_name" {
-  description = "The name of the S3 bucket"
+variable "s3_bucket_region" {
+  description = "The region of the S3 bucket"
   type        = string
   sensitive   = true
+  default     = "us-east-1"
+}
+
+variable "s3_bucket_name" {
+  description = "The name of the S3 bucket used for the application"
+  type        = string
 }
