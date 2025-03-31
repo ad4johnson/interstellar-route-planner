@@ -31,3 +31,4 @@ terraform.tfvars
 *.log
 *.out
 *.errterraform-state//
+terraform-state/
