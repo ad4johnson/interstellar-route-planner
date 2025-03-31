@@ -41,6 +41,17 @@ resource "aws_ecs_service" "interstellar_service" {
   depends_on = [aws_lb.interstellar_alb, aws_lb_target_group.interstellar_tg] # Ensure Load Balancer is created first
 }
 
+resource "aws_ecs_service" "example" {
+  name    = "example-service"
+  cluster = aws_ecs_cluster.main.id
+  # Other service configuration
+}
+
+resource "aws_ecs_cluster" "main" {
+  name       = "main-cluster"
+  depends_on = [aws_ecs_service.example]
+}
+
 # ===========================
 # Data Source for Subnets
 # ===========================
@@ -50,3 +61,5 @@ data "aws_subnets" "existing_subnets" {
     values = [var.vpc_id] # Filter subnets by VPC ID
   }
 }
+
+
