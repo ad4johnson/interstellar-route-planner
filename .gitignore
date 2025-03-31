@@ -30,4 +30,4 @@ terraform.tfvars
 # Logs
 *.log
 *.out
-*.err
+*.errterraform-state//
