@@ -22,7 +22,7 @@ The **Interstellar Route Planner** is a cloud-based service designed to help use
 
 You can access the **Interstellar Route Planner** through the following endpoint:
 
-- **[Interstellar Route Planner API](https://your-api-endpoint-link)**
+- **[Interstellar Route Planner API](interstellar-alb-1250703959.us-east-1.elb.amazonaws.com)**
 
 Please replace this with your actual endpoint once it's deployed.
 
