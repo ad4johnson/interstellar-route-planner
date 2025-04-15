@@ -7,7 +7,7 @@ AI-powered route optimization and anomaly detection system designed with full-st
 ## 🌐 Live Endpoint
 
 **Application Base URL:**  
-http://interstellar-alb-712592822.us-east-1.elb.amazonaws.com
+http://interstellar-alb-1155191774.us-east-1.elb.amazonaws.com
 
 - **Swagger Docs**: `/docs`
 - **Prometheus Metrics**: `/metrics`
