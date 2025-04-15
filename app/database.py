@@ -1,62 +1,93 @@
-import psycopg2
 import os
 import json
-from fastapi import FastAPI, HTTPException
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from fastapi import HTTPException
+from dotenv import load_dotenv
 
-app = FastAPI()
+# Load environment variables from .env file
+load_dotenv()
 
-# Correcting DB configuration with proper env vars
-db_config = {
-    "dbname": os.getenv("DB_NAME", "interstellar"),
-    "user": os.getenv("DB_USER", "admin"),
-    "password": os.getenv("DB_PASSWORD", "password"),
-    "host": os.getenv("DB_HOST", "db"),  # Corrected host
-    "port": os.getenv("DB_PORT", "5432"),
-}
+# ========================
+# DB Configuration via Env
+# ========================
+def get_db_config():
+    return {
+        "dbname": os.getenv("DB_NAME"),
+        "user": os.getenv("DB_USER"),
+        "password": os.getenv("DB_PASSWORD"),
+        "host": os.getenv("DB_HOST"),
+        "port": os.getenv("DB_PORT", "5432"),  # Default PostgreSQL port
+    }
 
-
+# ========================
+# Establish DB Connection
+# ========================
 def get_db_connection():
-    """Establishes a database connection and returns a cursor."""
+    """
+    Create and return a new DB connection using environment variables.
+    Raises HTTPException if connection fails.
+    """
     try:
-        conn = psycopg2.connect(**db_config)
+        config = get_db_config()
+        print(f"🔌 Connecting to DB at {config['host']}:{config['port']} as {config['user']}")
+        conn = psycopg2.connect(**config)
         return conn
+    except psycopg2.OperationalError as e:
+        print(f"❌ OperationalError: {e}")
+        raise HTTPException(status_code=500, detail=f"Database connection failed: {e}")
     except Exception as e:
-        raise RuntimeError(f"Database connection failed: {str(e)}")
+        print(f"❌ Unexpected DB error: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected DB error: {e}")
 
-
+# ========================
+# Query: Fetch All Gates
+# ========================
 def get_gates_from_db():
+    """
+    Fetch all gates from the database.
+    Returns a dictionary like:
+    {
+        "A1": {"name": "Alpha", "connections": {"B1": 3, "C1": 5}},
+        ...
+    }
+    """
     try:
         conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT id, name, connections FROM gate")
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("SELECT id, name, connections FROM gate;")
         rows = cur.fetchall()
-        cur.close()
-        conn.close()
 
         gates = {}
         for row in rows:
-            gate_id, name, connections = row
-            connections = (
-                json.loads(connections) if isinstance(connections, str) else connections
-            )
-            gates[gate_id] = {
-                "name": name,
-                "connections": {
-                    c["id"]: int(c["hu"]) for c in connections
-                },  # Convert to adjacency list format
-            }
+            gate_id = row["id"]
+            name = row["name"]
+            raw_connections = row["connections"]
+
+            try:
+                parsed_connections = (
+                    json.loads(raw_connections)
+                    if isinstance(raw_connections, str)
+                    else raw_connections
+                )
+                gates[gate_id] = {
+                    "name": name,
+                    "connections": {
+                        conn["id"]: int(conn["hu"]) for conn in parsed_connections
+                    },
+                }
+            except Exception as parse_error:
+                print(f"⚠️ Skipped gate {gate_id} due to parse error: {parse_error}")
+
+        cur.close()
+        conn.close()
         return gates
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-
-@app.get("/gates")
-def get_gates():
-    """API endpoint to retrieve all gates."""
-    try:
-        gates = get_gates_from_db()
-        if not gates:
-            return {"error": "No gates found in database"}
-        return {"gates": [{"id": k, "name": v["name"]} for k, v in gates.items()]}
+    except psycopg2.Error as e:
+        print(f"❌ DB query failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Database query failed: {e}")
     except Exception as e:
-        return {"error": f"Database error: {str(e)}"}
+        print(f"❌ Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    
+    print(f"✅ Connecting to DB @ {os.getenv('DB_HOST')}")

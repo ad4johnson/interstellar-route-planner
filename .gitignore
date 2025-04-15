@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.venv/
+env.bak/
+
+# Docker
+Dockerfile
+docker-compose.yml
+Dockerfile.*
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+*.tfstate
+.terraform.lock.hcl
+
+# Node.js
+node_modules/
+
+# Logs
+*.log
+*.out
+*.err
+
+# Env files
+.env
+
+# macOS-specific
+.DS_Store
+
+# Images
+*.png.DS_Store

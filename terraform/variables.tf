@@ -4,7 +4,6 @@
 variable "aws_region" {
   description = "The AWS region where resources will be deployed"
   type        = string
-  sensitive   = true
 }
 
 # ===========================
@@ -13,21 +12,18 @@ variable "aws_region" {
 variable "ecs_cluster_name" {
   description = "The name of the ECS cluster"
   type        = string
-  sensitive   = true
 }
 
 variable "ecs_task_cpu" {
   description = "CPU units for ECS tasks"
   type        = number
-  sensitive   = true
-  default     = 256
+  default     = 1024
 }
 
 variable "ecs_task_memory" {
   description = "Memory allocation for ECS tasks"
   type        = number
-  sensitive   = true
-  default     = 512
+  default     = 2048
 }
 
 # ===========================
@@ -51,37 +47,32 @@ variable "security_group_id" {
 variable "allowed_cidr_blocks" {
   description = "The CIDR blocks allowed for access"
   type        = list(string)
-  default     = [] # Secure default: no unrestricted access
+  default     = []
 }
 
 variable "subnet_cidr_block" {
   description = "The CIDR block for the subnet"
   type        = string
-  sensitive   = true
 }
 
 variable "availability_zone" {
   description = "The availability zone for the subnet"
   type        = string
-  sensitive   = true
 }
 
 variable "vpc_endpoint_service_name" {
   description = "The name of the VPC endpoint service"
   type        = string
-  sensitive   = true
 }
 
 variable "route_table_id" {
   description = "The ID of the route table"
   type        = string
-  sensitive   = true
 }
 
 variable "gateway_id" {
   description = "The ID of the internet gateway"
   type        = string
-  sensitive   = true
 }
 
 # ===========================
@@ -90,52 +81,41 @@ variable "gateway_id" {
 variable "interstellar_image_version" {
   description = "The version of the Interstellar Docker image"
   type        = string
-  sensitive   = true
   default     = "1.0.0"
 }
 
 variable "container_image" {
   description = "The container image for the Interstellar application"
   type        = string
-  sensitive   = true
 }
 
 # ===========================
 # Database Configuration
 # ===========================
 variable "db_name" {
-  description = "The name of the database"
   type        = string
-  sensitive   = true
-  default     = "interstellar"
-}
-
-variable "db_user" {
-  description = "The username for the database"
-  type        = string
-  sensitive   = true
-  default     = "admin"
-}
-
-variable "db_host" {
-  description = "The host of the database (retrieved from AWS SSM Parameter Store)"
-  type        = string
-  sensitive   = true
-  default     = "/interstellar/db_creds/DB_HOST"
+  description = "PostgreSQL database name"
 }
 
 variable "db_port" {
-  description = "The port number for the database"
+  type        = string
+  default     = "5432"
+  description = "PostgreSQL port"
+}
+variable "db_password" {
+  description = "The database password"
   type        = string
   sensitive   = true
-  default     = "5432"  # Default to PostgreSQL's standard port
 }
 
-variable "db_password" {
-  description = "The password for the database (stored securely in AWS SSM)"
+variable "db_user" {
+  description = "The database user"
   type        = string
-  sensitive   = true
-  default     = "/interstellar/db_password"
+}
+
+variable "db_host" {
+  description = "The database host"
+  type        = string
 }
 
 # ===========================
@@ -144,11 +124,28 @@ variable "db_password" {
 variable "s3_bucket_region" {
   description = "The region of the S3 bucket"
   type        = string
-  sensitive   = true
-  default     = "us-east-1"
 }
 
 variable "s3_bucket_name" {
-  description = "The name of the S3 bucket used for the application"
+  description = "The name of the S3 bucket"
+  type        = string
+}
+
+# ===========================
+# Docker Configuration
+# ===========================
+variable "docker_username" {
+  description = "DockerHub username"
+  type        = string
+}
+
+variable "docker_password" {
+  description = "DockerHub password"
+  type        = string
+  sensitive   = true
+}
+
+variable "local_ip" {
+  description = "Your machine's public IP used for DB initialization"
   type        = string
 }

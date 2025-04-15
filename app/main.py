@@ -1,73 +1,121 @@
-from fastapi import FastAPI, APIRouter
-import os
-import psycopg2
-import json
-from dotenv import load_dotenv
-from psycopg2 import OperationalError
-import sys
-sys.path.append("/app/")
-from app.utils import dijkstra
+from fastapi import FastAPI, APIRouter, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from prometheus_fastapi_instrumentator import Instrumentator
-from fastapi import FastAPI, Request
+from app.route import gates, anomaly
+from app.utils import dijkstra
+from app.anomaly_detection.detection import AnomalyDetector
+import os
+import json
+from app.utils import fetch_graph
+import threading
+import psycopg2
+from psycopg2 import OperationalError
+from typing import List
+import numpy as np
+from dotenv import load_dotenv
+from prometheus_client import Gauge
 
 
+# ========================
+# Metrics & Monitoring
+# ========================
+ANOMALY_DETECTED = Gauge("anomaly_detected", "1 = anomaly, 0 = normal")
 load_dotenv()
-app = FastAPI()
+
+app = FastAPI(title="Interstellar Route Planner", version="1.0")
 router = APIRouter()
-
-@app.post("/api/data")
-async def receive_data(request: Request):
-    data = await request.json()
-    return {"received": data}
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
-
-
-@router.get("/routes")
-async def get_routes():
-    return {"routes": ["Route1", "available"]}
-
 Instrumentator().instrument(app).expose(app)
 
-app.include_router(router, prefix="/api/v1")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Docker ECS PostgreSQL connection settings
-DATABASE_URL = os.getenv("DATABASE_URL")
+app.include_router(gates.router, prefix="/api/v1")
+app.include_router(anomaly.router, prefix="/api/v1")
 
-# Establish database connection
+# ========================
+# Anomaly Detection Setup
+# ========================
+class AnomalyInput(BaseModel):
+    values: List[List[float]]
+
+detector = AnomalyDetector('models/anomaly_detector.pkl')
+
+@app.post("/anomaly-detection")
+def detect_anomalies(data: AnomalyInput):
+    try:
+        data_array = np.array(data.values)
+        anomalies = detector.detect(data_array)
+        ANOMALY_DETECTED.set(1 if anomalies else 0)
+        return {
+            "anomalies_detected": bool(anomalies),
+            "anomaly_indices": anomalies if anomalies else [],
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Anomaly detection failed: {str(e)}")
+
+# Optional: simulate anomaly detection to populate metrics
+def anomaly_ping_loop():
+    import time
+    while True:
+        # Example input with 38 features
+        detect_anomalies(AnomalyInput(values=[[0.1] * 38]))
+        time.sleep(10)
+
+threading.Thread(target=anomaly_ping_loop, daemon=True).start()
+
+print("🚀 Application started with AnomalyDetector version: detect() present")
+
+# ========================
+# Database Connection
+# ========================
+def get_database_url():
+    user = os.getenv("DB_USER")
+    password = os.getenv("DB_PASSWORD")
+    host = os.getenv("DB_HOST")
+    port = os.getenv("DB_PORT", "5432")
+    name = os.getenv("DB_NAME")
+    return f"postgresql://{user}:{password}@{host}:{port}/{name}"
+
+DATABASE_URL = os.getenv("DATABASE_URL", get_database_url())
+
 try:
     conn = psycopg2.connect(DATABASE_URL)
     cursor = conn.cursor()
 except OperationalError as e:
     print("Database connection failed:", e)
-    cursor = None  # Prevent crashes if DB is down
+    cursor = None
 
-
+# ========================
+# API Endpoints
+# ========================
 @app.get("/")
 def root():
-    return {"message": "API is running!"}
+    return {"message": "Interstellar API is live!"}
 
-@app.post("/api/data")
-async def receive_data(request: Request):
-    data = await request.json()
-    return {"received": data}
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
 
+@app.get("/api")
+def api_root():
+    return {"message": "Interstellar API is live!"}
 
 @app.get("/gates")
 def get_gates():
-    """Returns a list of all gates"""
     if not cursor:
         return {"error": "Database connection failed"}
     cursor.execute("SELECT id, name FROM gate;")
-    gates = cursor.fetchall()
-    return [{"id": g[0], "name": g[1]} for g in gates]
-
+    result = cursor.fetchall()
+    return [{"id": row[0], "name": row[1]} for row in result]
 
 @app.get("/gates/{gateCode}")
 def get_gate(gateCode: str):
-    """Returns the details of a single gate"""
     if not cursor:
         return {"error": "Database connection failed"}
     cursor.execute("SELECT * FROM gate WHERE id = %s;", (gateCode,))
@@ -76,18 +124,44 @@ def get_gate(gateCode: str):
         return {"id": gate[0], "name": gate[1], "connections": json.loads(gate[2])}
     return {"error": "Gate not found"}
 
+import traceback
 
 @app.get("/gates/{gateCode}/to/{targetGateCode}")
 def get_cheapest_route(gateCode: str, targetGateCode: str):
-    """Finds the cheapest route between two gates"""
-    path, cost = dijkstra(gateCode, targetGateCode)
-    if path:
-        return {"route": path, "total_cost": cost}
-    return {"error": "Route not found"}
+    try:
+        path, cost = dijkstra(gateCode, targetGateCode)
+        if path:
+            return {"route": path, "total_cost": cost}
+        return {"error": "Route not found"}
+    except Exception as e:
+        print("❌ Routing exception:", e)
+        traceback.print_exc()  # <-- get full stack trace in CloudWatch logs
+        return {"error": f"Routing failed: {str(e)}"}
 
+@app.post("/api/data")
+async def receive_data(request: Request):
+    data = await request.json()
+    return {"received": data}
 
-# Run server with: `uvicorn main:app --reload`
+@router.get("/routes")
+async def get_routes():
+    return {"routes": ["Route1", "available"]}
+
+# ========================
+# Local Debug
+# ========================
+# @app.get("/debug/graph")
+def debug_graph():
+    from app.utils import fetch_graph
+    graph = fetch_graph()
+    return graph
+
+@app.get("/debug/graph")
+def debug_graph():
+    return fetch_graph()
+    print("🚀 Application started with AnomalyDetector version: detect() present")
+
+# ========================
 if __name__ == "__main__":
     import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

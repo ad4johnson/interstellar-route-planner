@@ -1,27 +1,28 @@
 # Use Python as the base image
-FROM python:3.9-slim
+FROM python:3.9-slim-bullseye
 
-# Install Node.js and npm
-RUN apt update && apt install -y nodejs npm
+# Install system packages
+RUN apt update && apt install -y nodejs npm postgresql-client
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy all project files
-COPY . /app
-
-# Upgrade pip
-RUN pip install --upgrade pip
+# Copy only requirements first for Docker caching
+COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Install Node.js dependencies globally
-RUN npm install -g npx knex
+# Copy the rest of the app
+COPY ./app /app/app
+COPY ./models /app/models
 
-# Expose the port your app runs on
+# Set PYTHONPATH to /app so we can import from app.*
+ENV PYTHONPATH=/app
+
+# Expose port
 EXPOSE 8000
 
-# Ensure migrations are run before starting the app
-CMD ["sh", "-c", "npx knex migrate:latest && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+# Run the app
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
