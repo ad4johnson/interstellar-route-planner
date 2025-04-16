@@ -3,6 +3,8 @@ services:
     image: postgres:15
     container_name: interstellar-postgres
     restart: always
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -67,10 +69,16 @@ services:
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter
     container_name: postgres-exporter
+    ports:
+      - "9187:9187"
+    env_file:
+      - .env
     environment:
-      DATA_SOURCE_NAME: "postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=require"
+    restart: always
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   node-exporter:
     image: prom/node-exporter

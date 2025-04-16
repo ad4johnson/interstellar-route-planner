@@ -3,7 +3,7 @@ import threading
 import time
 import random
 
-API = "http://interstellar-alb-712592822.us-east-1.elb.amazonaws.com"
+API = "http://interstellar-alb-1155191774.us-east-1.elb.amazonaws.com"
 
 def hit_get_routes():
     try:

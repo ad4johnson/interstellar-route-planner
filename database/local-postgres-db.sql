@@ -1,16 +1,3 @@
--- Create Database (if running manually, ensure the DB doesn't exist already)
-CREATE DATABASE interstellar;
-
--- Connect to the newly created database
-\c interstellar;
-
--- Create the gate table
-CREATE TABLE gate (
-    id VARCHAR(3) PRIMARY KEY,
-    name VARCHAR(20),
-    connections JSON
-);
-
 -- Insert sample gate data
 INSERT INTO gate (id, name, connections) VALUES
     ('SOL', 'Sol', '[{ "id": "RAN", "hu": "100" }, { "id": "PRX", "hu": "90" }, { "id": "SIR", "hu": "100" }, { "id": "ARC", "hu": "200" }, { "id": "ALD", "hu": "250" }]'),

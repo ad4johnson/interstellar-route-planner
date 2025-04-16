@@ -44,6 +44,11 @@ def fetch_graph() -> Dict[str, List[Dict[str, str]]]:
         return graph
     except Exception as e:
         print(f"❌ Failed to fetch graph: {e}")
+        try:
+            conn.rollback()  # 🛠 Reset transaction block on error
+            print("↩️ Rolled back failed transaction.")
+        except Exception as rollback_error:
+            print(f"❌ Rollback also failed: {rollback_error}")
         return {}
 
 

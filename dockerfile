@@ -1,5 +1,5 @@
 # Use Python as the base image
-FROM python:3.9-slim-bullseye
+FROM python:3.9-alpine
 
 # Install system packages
 RUN apt update && apt install -y nodejs npm postgresql-client

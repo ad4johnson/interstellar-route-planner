@@ -1,9 +1,14 @@
+-- Drop the gate table if it already exists (safe reset)
+DROP TABLE IF EXISTS gate;
+
+-- Create the gate table
 CREATE TABLE gate (
     id VARCHAR(3) PRIMARY KEY,
     name VARCHAR(20),
     connections JSON
 );
 
+-- Insert sample gate data
 INSERT INTO gate (id, name, connections) VALUES
     ('SOL', 'Sol', '[{ "id": "RAN", "hu": "100" }, { "id": "PRX", "hu": "90" }, { "id": "SIR", "hu": "100" }, { "id": "ARC", "hu": "200" }, { "id": "ALD", "hu": "250" }]'),
     ('PRX', 'Proxima', '[{ "id": "SOL", "hu": "90" }, { "id": "SIR", "hu": "100" }, { "id": "ALT", "hu": "150" }]'),
@@ -18,9 +23,6 @@ INSERT INTO gate (id, name, connections) VALUES
     ('VEG', 'Vega', '[{ "id": "ARC", "hu": "220" }, { "id": "ALD", "hu": "580" }]'),
     ('ALD', 'Aldermain', '[{ "id": "SOL", "hu": "200" }, { "id": "ALS", "hu": "160" }, { "id": "VEG", "hu": "320" }]'),
     ('ALS', 'Alshain', '[{ "id": "ALT", "hu": "1" }, { "id": "ALD", "hu": "1" }]');
-aws ecs execute-command \
-    --cluster interstellar-cluster \
-    --task 0fdd8ce4c46546f893448099b409cedc \
-    --container interstellar-app \
-    --command "pytest tests/ --verbose" \
-    --interactive
+
+-- Optional: verify
+SELECT * FROM gate;

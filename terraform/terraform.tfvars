@@ -34,7 +34,7 @@ security_group_id = "sg-04214c54cbf833e41"
 # =====================================
 # ✅ ECS Task Definition Configuration
 # =====================================
-container_image            = "597088035840.dkr.ecr.us-east-1.amazonaws.com/interstellar-route-planner:latest"
+container_image            = "ad4johnson/interstellar-app:latest"
 interstellar_image_version = "1.0.0"
 ecs_task_cpu               = 1024
 ecs_task_memory            = 2048
