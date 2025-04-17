@@ -3,7 +3,7 @@
 # ============================
 # ✅ Config: Replace with your ALB DNS
 # ============================
-ALB_DNS="interstellar-alb-1155191774.us-east-1.elb.amazonaws.com"
+ALB_DNS="interstellar-alb-1825407271.us-east-1.elb.amazonaws.com"
 
 # RDS PostgreSQL credentials
 DB_HOST="interstellar-db.cte24y8cq8cw.us-east-1.rds.amazonaws.com"
