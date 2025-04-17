@@ -11,7 +11,8 @@ db_user     = "interstellardbadmin"
 db_password = "T4rraform123" # Stored in SSM Parameter Store
 db_host     = "interstellar-db.cte24y8cq8cw.us-east-1.rds.amazonaws.com"
 db_port     = "5432"
-
+ecs_min_capacity           = 2
+ecs_max_capacity           = 10
 # =====================================
 # ✅ Networking Configuration
 # =====================================
@@ -38,6 +39,7 @@ container_image            = "ad4johnson/interstellar-app:latest"
 interstellar_image_version = "1.0.0"
 ecs_task_cpu               = 1024
 ecs_task_memory            = 2048
+
 
 # =====================================
 # ✅ S3 Configuration

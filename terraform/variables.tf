@@ -89,6 +89,20 @@ variable "container_image" {
   type        = string
 }
 
+# Autoscaling Configuration
+# ==============================
+variable "ecs_min_capacity" {
+  type        = number
+  default     = 1
+  description = "Minimum number of ECS tasks"
+}
+
+variable "ecs_max_capacity" {
+  type        = number
+  default     = 4
+  description = "Maximum number of ECS tasks"
+}
+
 # ===========================
 # Database Configuration
 # ===========================

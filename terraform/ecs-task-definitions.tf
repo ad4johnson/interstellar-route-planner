@@ -71,6 +71,11 @@ resource "aws_security_group_rule" "allow_local_psql" {
   cidr_blocks       = [var.local_ip]
   security_group_id = tolist(aws_db_instance.interstellar_db.vpc_security_group_ids)[0]
   description       = "Allow local Terraform provisioner to init RDS DB"
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes        = all
+  }
 }
 
 # ===========================
