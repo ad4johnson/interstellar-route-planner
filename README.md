@@ -1,150 +1,110 @@
-# Interstellar Route Planner 🚀
+# 🚀 Interstellar Route Planner
 
-AI-powered route optimization and anomaly detection system designed with full-stack observability, modular deployment, and cloud-native architecture. This project integrates FastAPI, Docker, Terraform, AWS services, and monitoring via Prometheus and Grafana.
-
----
-
-## 🌐 Live Endpoint
-
-**Application Base URL:**  
-http://interstellar-alb-1155191774.us-east-1.elb.amazonaws.com
-
-- **Swagger Docs**: `/docs`
-- **Prometheus Metrics**: `/metrics`
+An AI-powered FastAPI microservice to simulate interplanetary travel planning, detect route anomalies, and visualise system metrics using Prometheus and Grafana. Fully containerised and deployed via AWS Fargate and Terraform with CI/CD using GitHub Actions.
 
 ---
 
-## 📦 Features
+## 🌐 Live API Endpoints
 
-- 🚀 AI Anomaly Detection (IsolationForest-based)
-- 📡 FastAPI RESTful API for interstellar routing
-- 🧠 Pre-trained `.pkl` ML model integrated in production
-- 🐳 Dockerized architecture with Compose support
-- ☁️ AWS Fargate deployment via Terraform (Free-tier eligible)
-- 🛠️ Infrastructure includes ALB, RDS PostgreSQL, IAM, S3, API Gateway
-- 📈 Full observability stack (Prometheus + Grafana)
-- 🔁 GitHub Actions CI/CD pipeline
-- 🗃️ Secrets handled via `.env` + optional SSM Parameter Store
+| Endpoint | Description |
+|---------|-------------|
+| [`/`](http://interstellar-alb-1825407271.us-east-1.elb.amazonaws.com) | Health check |
+| [`/docs`](http://interstellar-alb-1825407271.us-east-1.elb.amazonaws.com/docs) | Swagger UI |
+| [`/gates/G1/to/G9`](http://interstellar-alb-1825407271.us-east-1.elb.amazonaws.com/gates/G1/to/G9) | Sample route path |
+| [`/anomaly-detection`](http://interstellar-alb-1825407271.us-east-1.elb.amazonaws.com/anomaly-detection) | POST endpoint for anomaly detection |
+| [`/metrics`](http://interstellar-alb-1825407271.us-east-1.elb.amazonaws.com/metrics) | Prometheus metrics exposition |
 
 ---
 
-## 🧠 AI Component
+## 🏛️ Infrastructure Overview
 
-- Trained on 38-feature dataset using IsolationForest
-- `models/anomaly_detector.pkl` is loaded in `app/anomaly_detection/detection.py`
-- Exposes anomaly metrics to Prometheus at `/metrics`
-
----
-
-## 📊 Monitoring Stack
-
-| Tool        | Purpose                         |
-|-------------|----------------------------------|
-| Prometheus  | Scrapes metrics from API/Node/DB |
-| Grafana     | Dashboards for live analysis     |
-| node_exporter | CPU/Memory system metrics     |
-| postgres_exporter | Database health stats     |
-
-### Grafana Panels
-- Anomaly Detection Signal
-- Request Duration
-- CPU & Memory Usage
-- API Request Rate
-- Status Code Heatmap
-- PostgreSQL Uptime
+- **ECS Fargate** (AWS) for scalable containerised deployment
+- **Amazon RDS PostgreSQL** for persistent data storage
+- **Application Load Balancer (ALB)** for public access
+- **Prometheus** (scrapes `/metrics`) for monitoring
+- **Grafana** dashboards to visualise metrics and anomalies
+- **GitHub Actions** for CI/CD pipeline
+- **Terraform** for reproducible infrastructure as code
 
 ---
 
-## 🧱 Architecture Diagram
+## 📈 Grafana Dashboard Panels
 
-![Infrastructure](./diagrams/interstellar_architecture_diagram.png)
-
-> Figure: Complete infrastructure showing networking, monitoring, CI/CD, compute, and ML components.
-
----
-
-## 📁 Directory Structure
-
-```
-interstellar-route-planner/
-├── app/                        # FastAPI application (routes, logic, anomaly detection)
-├── models/                     # Pre-trained ML model (.pkl)
-├── terraform/                  # Terraform files for AWS Infra
-├── monitoring/                 # Prometheus config & custom exporters
-├── docker/                     # Init scripts, volume configs
-├── diagrams/                   # Architecture diagrams
-├── scripts/, jobs/, tests/     # Dev tools and monitoring scripts
-├── docker-compose.yml          # Local environment definition
-├── requirements.txt            # Python deps
-└── README.md                   # You are here
-```
+- ✅ Anomaly Detection Signal
+- ⚖️ CPU Usage (%) — from Node Exporter
+- 📊 Memory Usage (%) — from Node Exporter
+- ⏱️ Request Duration Histograms
+- 🔢 API Request Rate and Status Codes
+- ♥️ PostgreSQL Health (via pg_up)
 
 ---
 
-## ⚙️ Local Development (Docker Compose)
+## 🛠️ Dev Commands
 
-### 1. Clone the Repo
 ```bash
-git clone https://github.com/ad4johnson/interstellar-route-planner.git
-cd interstellar-route-planner
-```
+# Start and rebuild the full local stack
+$ docker-compose down -v
+$ docker-compose up -d --build
 
-### 2. Add `.env`
-```bash
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=interstellar
-DB_USER=interstellardbadmin
-DB_PASSWORD=yourpassword
-```
+# Build and push Docker image to DockerHub
+$ docker build --no-cache -t interstellar-app .
+$ docker tag interstellar-app ad4johnson/interstellar-app:latest
+$ docker push ad4johnson/interstellar-app:latest
 
-### 3. Launch Services
-```bash
-docker-compose up --build
-```
+# Run stress test
+$ python stress_test.py
 
-### 4. Access Interfaces
-- FastAPI Swagger UI → http://localhost:8000/docs
-- Prometheus → http://localhost:9090
-- Grafana → http://localhost:3001  (`admin/admin`)
-
----
-
-## ☁️ Terraform Deployment (AWS)
-
-Deploys:
-- Fargate ECS cluster
-- ALB + Target Groups
-- Amazon RDS PostgreSQL
-- Prometheus & Grafana containers
-- IAM Roles & SSM support
-
-### Steps:
-```bash
-cd terraform
-terraform init
-terraform apply -var-file="terraform.tfvars"
-```
-
-Teardown:
-```bash
-terraform destroy -auto-approve
+# View metrics locally or via ALB
+$ curl http://localhost:8000/metrics
+$ curl http://interstellar-alb-1825407271.us-east-1.elb.amazonaws.com/metrics
 ```
 
 ---
 
-> Images located in `/diagrams/` or `/docs/` folders (recommended)
+## 🏐 Ports and Source Engines
+
+| Service                | Port | Source Engine                 |
+|------------------------|------|-------------------------------|
+| FastAPI API            | 8000 | uvicorn/Starlette             |
+| Prometheus             | 9090 | prom/prometheus               |
+| Grafana                | 3000 | grafana/grafana               |
+| Node Exporter          | 9100 | prom/node-exporter            |
+| PostgreSQL Exporter    | 9187 | prometheuscommunity/postgres-exporter |
+| RDS PostgreSQL         | 5432 | AWS RDS (PostgreSQL engine)   |
 
 ---
 
-## ✍️ Author
+## 📦 Terraform Management
 
-**Ade Johnson**  
-GitHub: [@ad4johnson](https://github.com/ad4johnson)
+```bash
+$ terraform init
+$ terraform plan -var-file="terraform.tfvars"
+$ terraform apply -var-file="terraform.tfvars"
+$ terraform destroy -var-file="terraform.tfvars"
+$ terraform state list
+```
 
 ---
 
-## 📜 License
+## 🔢 Git Best Practices
 
-MIT License
+```bash
+$ git init
+$ echo ".DS_Store" >> .gitignore
+$ git add .
+$ git commit -m "🔧 Setup: Clean infra + metrics integration"
+$ git push origin main
+```
+
+---
+
+## 🚫 Known Issues
+
+- Ensure `.env` is loaded for Docker builds
+- Rebuild with `--no-cache` to ensure metrics reinitialise
+- Verify Prometheus target discovery for `/metrics` scrape
+
+---
+
+**Maintained by:** adejohnson / `ad4johnson` on DockerHub
 
