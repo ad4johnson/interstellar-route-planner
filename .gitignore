@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.pyc
 
 # Virtual environments
 env/
@@ -14,6 +15,9 @@ env.bak/
 Dockerfile
 docker-compose.yml
 Dockerfile.*
+*.log
+docker-compose.override.yml
+
 
 # Terraform
 .terraform/
@@ -21,6 +25,7 @@ terraform.tfstate
 terraform.tfstate.backup
 *.tfvars
 *.tfstate
+*.tfstate.*
 .terraform.lock.hcl
 
 # Node.js
@@ -39,3 +44,13 @@ node_modules/
 
 # Images
 *.png.DS_Store
+
+# Volumes
+grafana_data/
+postgres_data/
+prometheus_data/
+
+# VSCode/IDE
+.vscode/
+.idea/
+*.backup

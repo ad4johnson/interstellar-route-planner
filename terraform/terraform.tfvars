@@ -6,13 +6,13 @@ aws_region = "us-east-1"
 # =====================================
 # ✅ Database Configuration
 # =====================================
-db_name     = "interstellar"
-db_user     = "interstellardbadmin"
-db_password = "T4rraform123" # Stored in SSM Parameter Store
-db_host     = "interstellar-db.cte24y8cq8cw.us-east-1.rds.amazonaws.com"
-db_port     = "5432"
-ecs_min_capacity           = 2
-ecs_max_capacity           = 10
+db_name          = "interstellar"
+db_user          = "interstellardbadmin"
+db_password      = "T4rraform123" # Stored in SSM Parameter Store
+db_host          = "interstellar-db.cte24y8cq8cw.us-east-1.rds.amazonaws.com"
+db_port          = "5432"
+ecs_min_capacity = 2
+ecs_max_capacity = 10
 # =====================================
 # ✅ Networking Configuration
 # =====================================
