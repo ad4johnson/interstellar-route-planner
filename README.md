@@ -1,15 +1,16 @@
 # 🚀 Interstellar Route Planner — AI-Powered API
 
+An AI-powered FastAPI microservice to simulate interplanetary travel planning, detect route anomalies, and visualise system metrics using Prometheus and Grafana. Fully containerised and deployed via AWS Fargate and Terraform with CI/CD using GitHub Actions.
 
-**An AI-powered FastAPI microservice to simulate interplanetary travel planning, detect route anomalies, and visualise system metrics using Prometheus and Grafana. Fully containerised and deployed via AWS Fargate and Terraform with CI/CD using GitHub Actions.**
+---
 
 ## 📁 Features
 
-- ⚙️ **FastAPI** application with OpenAPI documentation
-- 🤖 **Anomaly detection** using trained Isolation Forest model (`anomaly_detector.pkl`)
-- 🗄️ **PostgreSQL** database on Amazon RDS
-- 🐳 Dockerized and deployed to **ECS Fargate**
-- 📈 Real-time **monitoring via Prometheus + Grafana**
+- ⚙️ FastAPI application with OpenAPI documentation
+- 🤖 Anomaly detection using trained Isolation Forest model (`anomaly_detector.pkl`)
+- 🗄️ PostgreSQL database on Amazon RDS
+- 🐳 Dockerized and deployed to ECS Fargate
+- 📈 Real-time monitoring via Prometheus + Grafana
 - 🔒 IAM roles, SSM for secrets, and Terraform IaC
 - ⚡ CI/CD via GitHub Actions and DockerHub
 
@@ -109,42 +110,42 @@ python database_checker.py
 ```
 
 ---
+
 ## 🛠️ Dev Commands
 
 ```bash
 # Start and rebuild the full local stack
-$ docker-compose down -v
-$ docker-compose up -d --build
+docker-compose down -v
+docker-compose up -d --build
 
 # Build and push Docker image to DockerHub
-$ docker build --no-cache -t interstellar-app .
-$ docker tag interstellar-app ad4johnson/interstellar-app:latest
-$ docker push ad4johnson/interstellar-app:latest
+docker build --no-cache -t interstellar-app .
+docker tag interstellar-app ad4johnson/interstellar-app:latest
+docker push ad4johnson/interstellar-app:latest
 
 # Run stress test
-$ python stress_test.py
+python stress_test.py
 
 # View metrics locally or via ALB
-$ curl http://localhost:8000/metrics
-$ curl http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com/metrics
+curl http://localhost:8000/metrics
+curl http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com/metrics
 ```
 
 ---
 
-
-
 ## 🏐 Ports and Source Engines
 
-| Service                | Port | Source Engine                 |
-|------------------------|------|-------------------------------|
-| FastAPI API            | 8000 | uvicorn/Starlette             |
-| Prometheus             | 9090 | prom/prometheus               |
-| Grafana                | 3000 | grafana/grafana               |
-| Node Exporter          | 9100 | prom/node-exporter            |
-| PostgreSQL Exporter    | 9187 | prometheuscommunity/postgres-exporter |
-| RDS PostgreSQL         | 5432 | AWS RDS (PostgreSQL engine)   |
+| Service               | Port | Source Engine                                  |
+|----------------------|------|------------------------------------------------|
+| FastAPI API           | 8000 | uvicorn/Starlette                              |
+| Prometheus            | 9090 | prom/prometheus                                |
+| Grafana               | 3000 | grafana/grafana                                |
+| Node Exporter         | 9100 | prom/node-exporter                             |
+| PostgreSQL Exporter   | 9187 | prometheuscommunity/postgres-exporter          |
+| RDS PostgreSQL        | 5432 | AWS RDS (PostgreSQL engine)                    |
 
 ---
+
 ## ☁️ Infrastructure Deployment Steps (Terraform)
 
 ### Prerequisites
@@ -153,24 +154,21 @@ $ curl http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com/metrics
 - DockerHub credentials (for pulling/pushing containers)
 
 ### Step-by-Step Deployment
-1. Initialise Terraform:
+
 ```bash
+# Initialise Terraform
 terraform init
-```
 
-2. Preview the plan:
-```bash
+# Preview the plan
 terraform plan -var-file="terraform.tfvars"
-```
 
-3. Apply the infrastructure:
-```bash
+# Apply the infrastructure
 terraform apply -var-file="terraform.tfvars"
 ```
 
-4. Wait for ECS service, RDS instance, ALB, and Prometheus stack to be provisioned
+- Wait for ECS service, RDS instance, ALB, and Prometheus stack to be provisioned
 
-5. Verify output:
+- Verify output:
 ```bash
 echo "ALB: $(terraform output -raw load_balancer_dns)"
 curl http://<alb-dns>/docs
@@ -180,13 +178,13 @@ curl http://<alb-dns>/docs
 
 ## 🧯 Common Issues & Remedies
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| RDS connection timeout | ECS tasks not allowed in RDS SG | Add ECS SG to RDS ingress rule |
-| Metrics not showing | Prometheus not scraping | Restart Prometheus and check targets |
-| 502 errors via ALB | ECS task not healthy | Check task logs, DB env, and service status |
-| Anomaly signal missing | Metric not set in code | Ensure `anomaly_signal.set(...)` is called |
-| FastAPI metrics empty | Instrumentation not added | Add `prometheus_fastapi_instrumentator` to app |
+| Issue                     | Cause                              | Fix                                           |
+|--------------------------|-------------------------------------|-----------------------------------------------|
+| RDS connection timeout    | ECS tasks not allowed in RDS SG     | Add ECS SG to RDS ingress rule                |
+| Metrics not showing       | Prometheus not scraping             | Restart Prometheus and check targets          |
+| 502 errors via ALB        | ECS task not healthy                | Check task logs, DB env, and service status   |
+| Anomaly signal missing    | Metric not set in code              | Ensure `anomaly_signal.set(...)` is called    |
+| FastAPI metrics empty     | Instrumentation not added           | Add `prometheus_fastapi_instrumentator` to app|
 
 ---
 
@@ -199,6 +197,7 @@ curl http://<alb-dns>/docs
 ---
 
 ## 🧪 CI/CD Notes
+
 - GitHub Actions triggers on `push`
 - Docker image built and pushed to DockerHub
 - ECS service updates automatically with latest image if enabled
@@ -209,3 +208,6 @@ curl http://<alb-dns>/docs
 
 For questions, raise an issue or contact [@ad4johnson](https://github.com/ad4johnson)
 
+---
+
+**© 2025 — Interstellar Route Planner**
