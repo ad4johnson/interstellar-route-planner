@@ -126,7 +126,7 @@ $ python stress_test.py
 
 # View metrics locally or via ALB
 $ curl http://localhost:8000/metrics
-$ curl http://interstellar-alb-1825407271.us-east-1.elb.amazonaws.com/metrics
+$ curl http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com/metrics
 ```
 
 ---
