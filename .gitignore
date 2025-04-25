@@ -53,4 +53,5 @@ prometheus_data/
 # VSCode/IDE
 .vscode/
 .idea/
-*.backup
+*.backupdata/import pandas as pd.py
+terraform/terraform.tfstate.*.backup
