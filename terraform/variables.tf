@@ -40,7 +40,7 @@ variable "public_subnet_ids" {
 }
 
 variable "security_group_id" {
-  description = "The ID of the security group"
+  description = "The ID of the ECS service security group"
   type        = string
 }
 

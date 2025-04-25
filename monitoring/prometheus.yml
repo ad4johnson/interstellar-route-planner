@@ -9,7 +9,7 @@ scrape_configs:
   - job_name: 'interstellar-api-ecs'  # ECS ALB metrics
     metrics_path: /metrics
     static_configs:
-      - targets: ['interstellar-alb-1825407271.us-east-1.elb.amazonaws.com']
+      - targets: ['interstellar-alb-1176058554.us-east-1.elb.amazonaws.com']
 
   - job_name: 'interstellar-api-local'  # Local dev metrics (FastAPI)
     metrics_path: /metrics

@@ -1,8 +1,10 @@
+version: "3.8"
+
 services:
   postgres:
     image: postgres@sha256:fe45ed1a824b81c0c9c605890963b67501758ca8c946db89089c85ce0f88e974
     container_name: interstellar-postgres
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -14,14 +16,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/init:/docker-entrypoint-initdb.d
+    networks:
+      - interstellar_net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
+      timeout: 5s
       retries: 5
 
   app:
     build: .
     container_name: interstellar-route-planner-app
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,6 +40,8 @@ services:
       DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
     ports:
       - "8000:8000"
+    networks:
+      - interstellar_net
     command: >
       sh -c "
         echo '⏳ Waiting for PostgreSQL to be ready...';
@@ -48,16 +56,26 @@ services:
       "
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:latest
     container_name: interstellar-prometheus
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
     ports:
       - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - interstellar_net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:10.2.3
     container_name: grafana
+    restart: unless-stopped
     ports:
       - "3001:3000"
     environment:
@@ -65,26 +83,39 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
       - grafana_data:/var/lib/grafana
+    networks:
+      - interstellar_net
 
   postgres-exporter:
-    image: prometheuscommunity/postgres-exporter
+    image: prometheuscommunity/postgres-exporter:latest
     container_name: postgres-exporter
+    restart: unless-stopped
     ports:
       - "9187:9187"
     env_file:
       - .env
     environment:
       DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=require"
-    restart: always
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - interstellar_net
 
   node-exporter:
     image: prom/node-exporter
     container_name: node-exporter
     restart: unless-stopped
+    ports:
+      - "9100:9100"
+    networks:
+      - interstellar_net
 
 volumes:
   postgres_data:
   grafana_data:
+  prometheus_data:
+
+networks:
+  interstellar_net:
+    driver: bridge

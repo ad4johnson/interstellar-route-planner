@@ -1,39 +1,35 @@
-output "load_balancer_dns" {
-  value       = aws_lb.interstellar_alb.dns_name
-  description = "The DNS name of the Application Load Balancer"
+# outputs.tf
+
+output "api_urls" {
+  description = "Public API and documentation endpoints"
+  value = {
+    backend_api_url  = "http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com/api"
+    backend_docs_url = "http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com/docs"
+    backend_url      = "http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com"
+  }
 }
 
-output "interstellar_service_name" {
-  value = aws_ecs_service.interstellar_service.name
+output "ecs_service_info" {
+  description = "ECS metadata and IAM roles"
+  value = {
+    ecs_cluster_name                 = "Sensitive value hidden" # Terraform will hide sensitive output
+    interstellar_service_name        = "interstellar-service"
+    interstellar_task_definition_arn = "arn:aws:ecs:us-east-1:597088035840:task-definition/interstellar-task:132"
+    interstellar_execution_role_arn  = "arn:aws:iam::597088035840:role/ecsExecutionRole"
+    interstellar_task_role_arn       = "arn:aws:iam::597088035840:role/ecsTaskRole"
+  }
 }
 
-output "ecs_cluster_name" {
-  value     = aws_ecs_cluster.main.name
-  sensitive = true
+output "load_balancer_info" {
+  description = "Application Load Balancer Info"
+  value = {
+    load_balancer_dns = "interstellar-alb-1176058554.us-east-1.elb.amazonaws.com"
+  }
 }
 
-output "backend_url" {
-  value       = "http://${aws_lb.interstellar_alb.dns_name}"
-  description = "Public URL of the Interstellar backend via ALB"
-}
-
-output "backend_api_url" {
-  value       = "http://${aws_lb.interstellar_alb.dns_name}/api"
-  description = "Public URL of the Interstellar backend API via ALB"
-}
-output "interstellar_task_definition_arn" {
-  value       = aws_ecs_task_definition.interstellar_task.arn
-  description = "The ARN of the Interstellar ECS task definition"
-}
-output "interstellar_task_role_arn" {
-  value       = aws_iam_role.ecs_task_role.arn
-  description = "The ARN of the ECS task role"
-}
-output "interstellar_execution_role_arn" {
-  value       = aws_iam_role.ecs_execution_role.arn
-  description = "The ARN of the ECS execution role"
-}
-output "backend_docs_url" {
-  value       = "http://${aws_lb.interstellar_alb.dns_name}/docs"
-  description = "Public URL of the Interstellar backend documentation via ALB"
+output "connectivity_info" {
+  description = "Detected Public IP Address for DB Access"
+  value = {
+    my_current_public_ip = "149.71.17.101"
+  }
 }
