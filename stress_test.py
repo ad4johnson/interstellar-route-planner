@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 load_dotenv()
 
-API = os.getenv("BASE_URL", "http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com")
+API = os.getenv("BASE_URL", "http://interstellar-alb-1254490069.us-east-1.elb.amazonaws.com")
 
 def hit_get_routes():
     try:

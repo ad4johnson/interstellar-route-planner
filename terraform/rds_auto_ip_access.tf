@@ -9,7 +9,7 @@ data "http" "my_ip" {
 resource "aws_security_group" "rds_access_sg" {
   name        = "allow-postgres-from-my-ip"
   description = "Allow PostgreSQL access from my public IP"
-  vpc_id      = data.aws_vpc.existing.id # <-- or aws_vpc.main.id if you used resource
+  vpc_id      = data.aws_vpc.main.id # <-- or aws_vpc.main.id if you used resource
 
 
   ingress {

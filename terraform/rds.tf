@@ -30,7 +30,7 @@ resource "aws_db_instance" "interstellar_db" {
 # ===========================
 resource "aws_db_subnet_group" "interstellar_subnet_group" {
   name       = "interstellar-db-subnet-group"
-  subnet_ids = var.public_subnet_ids
+  subnet_ids = aws_subnet.public[*].id
 
   tags = {
     Name        = "interstellar-db-subnet-group"

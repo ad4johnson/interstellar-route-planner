@@ -1,35 +1,53 @@
-# outputs.tf
-
-output "api_urls" {
-  description = "Public API and documentation endpoints"
-  value = {
-    backend_api_url  = "http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com/api"
-    backend_docs_url = "http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com/docs"
-    backend_url      = "http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com"
-  }
+# ================================
+# Application Load Balancer URLs
+# ================================
+output "alb_dns_name" {
+  description = "The DNS name of the Application Load Balancer (ALB)"
+  value       = aws_lb.interstellar_alb.dns_name
 }
 
-output "ecs_service_info" {
-  description = "ECS metadata and IAM roles"
-  value = {
-    ecs_cluster_name                 = "Sensitive value hidden" # Terraform will hide sensitive output
-    interstellar_service_name        = "interstellar-service"
-    interstellar_task_definition_arn = "arn:aws:ecs:us-east-1:597088035840:task-definition/interstellar-task:132"
-    interstellar_execution_role_arn  = "arn:aws:iam::597088035840:role/ecsExecutionRole"
-    interstellar_task_role_arn       = "arn:aws:iam::597088035840:role/ecsTaskRole"
-  }
+output "alb_http_url" {
+  description = "Public HTTP endpoint of the API (root)"
+  value       = "http://${aws_lb.interstellar_alb.dns_name}"
 }
 
-output "load_balancer_info" {
-  description = "Application Load Balancer Info"
-  value = {
-    load_balancer_dns = "interstellar-alb-1176058554.us-east-1.elb.amazonaws.com"
-  }
+output "alb_docs_url" {
+  description = "Public HTTP endpoint of the API Docs (/docs)"
+  value       = "http://${aws_lb.interstellar_alb.dns_name}/docs"
 }
 
-output "connectivity_info" {
-  description = "Detected Public IP Address for DB Access"
-  value = {
-    my_current_public_ip = "149.71.17.101"
-  }
+# ================================
+# ECS Service Details
+# ================================
+output "ecs_cluster_name" {
+  description = "ECS Cluster Name"
+  value       = aws_ecs_cluster.main.name
+}
+
+output "ecs_service_name" {
+  description = "ECS Service Name"
+  value       = aws_ecs_service.interstellar_service.name
+}
+
+output "ecs_task_definition_arn" {
+  description = "ECS Task Definition ARN"
+  value       = aws_ecs_task_definition.interstellar_task.arn
+}
+
+output "ecs_execution_role_arn" {
+  description = "ECS Execution IAM Role ARN"
+  value       = aws_iam_role.ecs_execution_role.arn
+}
+
+output "ecs_task_role_arn" {
+  description = "ECS Task IAM Role ARN"
+  value       = aws_iam_role.ecs_task_role.arn
+}
+
+# ================================
+# Connectivity (Database Access IP)
+# ================================
+output "my_current_public_ip" {
+  description = "Your current detected public IP (for RDS security group)"
+  value       = local.current_ip
 }

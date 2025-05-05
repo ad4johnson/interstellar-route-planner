@@ -6,8 +6,8 @@ resource "aws_ecs_service" "interstellar_service" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = var.public_subnet_ids
-    security_groups  = [var.security_group_id]
+    subnets          = aws_subnet.public[*].id
+    security_groups  = [aws_security_group.interstellar_sg.id]
     assign_public_ip = true
   }
 

@@ -61,24 +61,6 @@ resource "aws_ecs_task_definition" "interstellar_task" {
 
 
 # ===========================
-# Security Group Rule: Allow ECS to access PostgreSQL
-# ===========================
-resource "aws_security_group_rule" "allow_local_psql" {
-  type              = "ingress"
-  from_port         = 5432
-  to_port           = 5432
-  protocol          = "tcp"
-  cidr_blocks       = [var.local_ip]
-  security_group_id = tolist(aws_db_instance.interstellar_db.vpc_security_group_ids)[0]
-  description       = "Allow local Terraform provisioner to init RDS DB"
-
-  lifecycle {
-    create_before_destroy = true
-    ignore_changes        = all
-  }
-}
-
-# ===========================
 # CloudWatch Logs Group (Make sure this exists)
 # ===========================
 resource "aws_cloudwatch_log_group" "interstellar_logs" {

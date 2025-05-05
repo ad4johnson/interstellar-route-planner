@@ -15,8 +15,14 @@ resource "random_id" "suffix" {
 resource "aws_lb" "interstellar_alb" {
   name               = "interstellar-alb"
   load_balancer_type = "application"
-  subnets            = var.public_subnet_ids
-  security_groups    = [var.security_group_id]
+
+  # Updated to use only 2 subnets explicitly (best practice for ALB + Free Tier OK)
+  subnets = [
+    aws_subnet.public[0].id, # us-east-1a (example AZ)
+    aws_subnet.public[1].id  # us-east-1b (example AZ)
+  ]
+
+  security_groups = [aws_security_group.interstellar_sg.id]
 
   tags = {
     Environment = "production"
