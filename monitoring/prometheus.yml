@@ -6,23 +6,19 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'interstellar-api-ecs'  # ECS ALB metrics
+  - job_name: 'interstellar-api-ecs'  # ECS ALB metrics (!!! UPDATE THIS)
     metrics_path: /metrics
     static_configs:
-      - targets: ['interstellar-alb-1254490069.us-east-1.elb.amazonaws.com']
+      - targets: ['interstellar-alb-1254490069.us-east-1.elb.amazonaws.com:80']
 
   - job_name: 'interstellar-api-local'  # Local dev metrics (FastAPI)
     metrics_path: /metrics
     static_configs:
-      - targets: ['localhost:8000']
+      - targets: ['host.docker.internal:8000']  # Optional: avoid localhost in docker
 
-  - job_name: 'node'  # System-level node exporter (macOS)
+  - job_name: 'node'  # System-level node exporter (macOS local)
     static_configs:
       - targets: ['localhost:9100']
-
-  - job_name: 'mac-metrics'  # Optional macOS metrics
-    static_configs:
-      - targets: ['localhost:9182']
 
   - job_name: 'node-exporter'
     static_configs:
