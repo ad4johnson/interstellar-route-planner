@@ -109,3 +109,13 @@ resource "aws_security_group" "interstellar_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group_rule" "allow_alb_to_ecs" {
+  type                     = "ingress"
+  from_port                = 8000
+  to_port                  = 8000
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.interstellar_sg.id  # ECS SG
+  source_security_group_id = tolist(aws_lb.interstellar_alb.security_groups)[0]  # ALB SG
+  description              = "Allow ALB to access ECS on port 8000"
+}
