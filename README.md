@@ -1,217 +1,155 @@
-# 🚀 Interstellar Route Planner — AI-Powered API
+# Interstellar Route Planner (AI-Powered + Cloud-Native)
 
-An AI-powered FastAPI microservice to simulate interplanetary travel planning, detect route anomalies, and visualise system metrics using Prometheus and Grafana. Fully containerised and deployed via AWS Fargate and Terraform with CI/CD using GitHub Actions.
+![Grafana Dashboard](./images/monitoring_dashboard.png)
 
----
+> A production-ready, AI-enhanced FastAPI microservice powered by AWS ECS, RDS, Prometheus, and Grafana for route planning, anomaly detection, and real-time observability.
 
-## 📁 Features
+## Overview
 
-- ⚙️ FastAPI application with OpenAPI documentation
-- 🧠 Anomaly detection using trained Isolation Forest model (`anomaly_detector.pkl`)
-- 🗔️ PostgreSQL database on Amazon RDS
-- 🐳 Dockerized and deployed to ECS Fargate
-- 📈 Real-time monitoring via Prometheus + Grafana
-- 🔒 IAM roles, SSM for secrets, and Terraform IaC
-- ⚡ CI/CD via GitHub Actions and DockerHub
+Interstellar Route Planner is a cloud-native service designed to plan optimal space routes while leveraging AI anomaly detection to identify irregular inputs. This project was built for research and production-grade deployments with observability and resilience in mind.
 
----
+**Core Features:**
 
-## 📦 Tech Stack Overview
+* FastAPI backend for route and anomaly APIs
+* Machine Learning Anomaly Detection (IsolationForest model)
+* Prometheus metrics exposure (`/metrics`)
+* Grafana dashboards (preconfigured for monitoring)
+* AWS ECS (Fargate) deployment + RDS PostgreSQL
+* Local Docker Compose stack for testing
+* Stress testing script included
 
-| Layer             | Technology                           |
-|-------------------|--------------------------------------|
-| Backend API       | FastAPI (Python)                     |
-| AI Model          | Scikit-learn IsolationForest         |
-| DB                | Amazon RDS (PostgreSQL)              |
-| Infra Deployment  | Terraform + AWS Fargate              |
-| Monitoring        | Prometheus, Grafana                  |
-| Exporters         | Node Exporter, Postgres Exporter     |
-| Container Image   | DockerHub: `ad4johnson/interstellar-app:latest` |
+## Architecture
 
----
-
-## 📡 Live Endpoints
-
-| URL | Description |
-|-----|-------------|
-| `http://<ALB-DNS>/docs` | Swagger UI API Docs |
-| `http://<ALB-DNS>/metrics` | Prometheus metrics endpoint |
-| `http://<Grafana-DNS>` (optional) | Grafana dashboard |
-
----
-
-## 🫠 Anomaly Detection
-
-- `/analyze` route uses a trained Isolation Forest model.
-- Returns JSON:
-```json
-{ "anomalies_detected": true/false, "anomaly_indices": [0, 1, ...] }
 ```
-- Custom Prometheus metric `anomaly_detection_signal` is exposed.
-
----
-
-## 📊 Monitoring Stack
-
-Prometheus scrapes metrics from:
-- FastAPI app (`/metrics`)
-- Node Exporter (`:9100`)
-- Postgres Exporter (`:9187`)
-
-Grafana panels include:
-- Anomaly Detection Signal
-- API Request Rate and Latency
-- Request Status Codes (2xx, 4xx, etc.)
-- CPU and Memory Usage
-- PostgreSQL Database Health (`pg_up`)
-
----
-
-## 🔍 Exposed Prometheus Metrics
-
-| Metric Name | Description |
-|-------------|-------------|
-| `http_requests_total` | Total API calls |
-| `http_response_status` | HTTP status code breakdown |
-| `http_request_duration_seconds` | API request latencies |
-| `anomaly_detection_signal` | AI anomaly signal (0/1) |
-| `pg_up` | PostgreSQL DB health |
-| `node_cpu_seconds_total` | Node CPU usage |
-| `node_memory_MemAvailable_bytes` | Node memory availability |
-
----
-
-## 🛠️ Local Development Steps
-
-1. **Clone the repository:**
-```bash
-git clone https://github.com/ad4johnson/interstellar-route-planner.git
-cd interstellar-route-planner
+User -> API Gateway / ALB -> ECS (Fargate + Interstellar API)
+                                     |
+                                     v
+                              RDS PostgreSQL (AWS)
+                                     |
+                                     v
+  Prometheus -> Grafana (Anomaly, Request, Resource Metrics)
 ```
 
-2. **Set up virtual environment and install dependencies:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+* ECS Fargate: Runs the Dockerized Interstellar app
+* RDS PostgreSQL: Stores route data and logs
+* Prometheus: Scrapes `/metrics` endpoint for monitoring
+* Grafana: Dashboards for anomaly signals, API performance, DB health, CPU/MEM usage
+
+## Project structure
+
+```
+├── app/
+│   ├── anomaly_detection/
+│   ├── database.py
+│   ├── main.py
+├── docker-compose.yml
+├── terraform/
+├── stress_test.py
+├── models/
+│   └── anomaly_detector.pkl
+├── monitoring/
+│   └── prometheus.yml
+└── README.md
 ```
 
-3. **Copy and configure `.env`:**
+## Getting Started
+
+### Requirements
+
+* Docker + Docker Compose
+* Terraform
+* AWS Account (for ECS + RDS deployment)
+* Python 3.9+
+
+### Local Development
+
 ```bash
-cp .env.example .env
-# Edit .env for DB credentials and API configs
+docker compose up --build
 ```
 
-4. **Run the FastAPI server locally:**
-```bash
-uvicorn app.main:app --reload
-```
+**Available at:**
 
-5. **Optional: test DB connectivity:**
-```bash
-python database_checker.py
-```
+* API -> [http://localhost:8000/docs](http://localhost:8000/docs)
+* Prometheus -> [http://localhost:9090](http://localhost:9090)
+* Grafana -> [http://localhost:3000](http://localhost:3000) (admin/admin)
 
----
-
-## 🛠️ Dev Commands
+### Stress Test (optional)
 
 ```bash
-# Start and rebuild the full local stack
-docker-compose down -v
-docker-compose up -d --build
-
-# Build and push Docker image to DockerHub
-docker build --no-cache -t interstellar-app .
-docker tag interstellar-app ad4johnson/interstellar-app:latest
-docker push ad4johnson/interstellar-app:latest
-
-# Run stress test
 python stress_test.py
-
-# View Prometheus metrics
-curl http://localhost:8000/metrics
-curl http://interstellar-alb-1176058554.us-east-1.elb.amazonaws.com/metrics
 ```
 
----
+### Cloud Deployment (Terraform)
 
-## 🏐 Ports and Source Engines
+Update `terraform/terraform.tfvars` with your values:
 
-| Service                | Port | Source Engine                                  |
-|------------------------|------|------------------------------------------------|
-| FastAPI API             | 8000 | uvicorn/Starlette                              |
-| Prometheus              | 9090 | prom/prometheus                                |
-| Grafana                 | 3000 | grafana/grafana                                |
-| Node Exporter           | 9100 | prom/node-exporter                             |
-| PostgreSQL Exporter     | 9187 | prometheuscommunity/postgres-exporter          |
-| RDS PostgreSQL          | 5432 | AWS RDS (PostgreSQL engine)                    |
+```hcl
+aws_region = "us-east-1"
+db_name    = "interstellar"
+...
+container_image = "ad4johnson/interstellar-app:latest"
+```
 
----
-
-## ☁️ Infrastructure Deployment Steps (Terraform)
-
-### Prerequisites
-- AWS CLI configured with proper IAM permissions
-- Terraform installed and authenticated
-- DockerHub credentials (for pushing container images)
-
-### Step-by-Step Deployment
+Then:
 
 ```bash
-# Initialise Terraform
+cd terraform
 terraform init
-
-# Preview infrastructure plan
-terraform plan -var-file="terraform.tfvars"
-
-# Apply the infrastructure
-terraform apply -var-file="terraform.tfvars"
+terraform plan
+terraform apply
 ```
 
-**Verify deployment:**
+After apply, you will get the ALB public URL:
+
+```
+http://interstellar-alb-XXXX.elb.amazonaws.com
+```
+
+#### Access API
+
+```
+http://interstellar-alb-XXXX.elb.amazonaws.com/docs
+http://interstellar-alb-XXXX.elb.amazonaws.com/metrics
+```
+
+## Monitoring (Prometheus + Grafana)
+
+Pre-configured dashboards provide:
+
+* Anomaly Detection Signal (from /metrics)
+* API Request Rates and Status
+* Resource Usage (CPU / MEM / DB Health)
+* Request Duration
+
+Grafana will automatically discover Prometheus data sources when using docker compose.
+
+## AI Anomaly Detection
+
+* Isolation Forest Model (trained on simulated dataset)
+* `/anomaly-detection` POST endpoint
+* `anomaly_detected` metric exposed for Prometheus
+
 ```bash
-echo "ALB DNS: $(terraform output -raw load_balancer_dns)"
-curl http://<alb-dns>/docs
+curl -X POST http://localhost:8000/anomaly-detection \
+    -H "Content-Type: application/json" \
+    -d '{"values": [[0.5, 0.1, 0.8, ..., 0.3]]}'
 ```
 
----
+## Destroy Cloud Infra
 
-## 🛯️ Common Issues & Remedies
+```bash
+cd terraform
+terraform destroy
+```
 
-| Issue                  | Cause                              | Fix                                           |
-|------------------------|------------------------------------|-----------------------------------------------|
-| RDS connection timeout | ECS tasks not allowed in RDS SG    | Add ECS SG to RDS inbound rules               |
-| Metrics not showing    | Prometheus config/scraping issue   | Restart Prometheus and verify targets         |
-| 502 Bad Gateway (ALB)  | ECS task unhealthy or crashlooping | Check ECS task logs, DB credentials           |
-| Anomaly signal missing | Metric not being set               | Ensure `anomaly_signal.set(...)` is called     |
-| Metrics empty          | Prometheus middleware missing     | Add `prometheus_fastapi_instrumentator`       |
+## License
 
----
+MIT License.
 
-## 📈 Visual Dashboard Example
+## Contributing
 
-- Visit: `http://<grafana-url>`
-- Import dashboard JSON or use existing panels
-- Sample screenshots stored in `/Figures/Monitoring/`
+Pull Requests and Issues are welcome.
 
----
+## Credits
 
-## 🗪️ CI/CD Notes
-
-- GitHub Actions triggers build on each `push`
-- Docker image is built and pushed to DockerHub
-- ECS service can auto-update from DockerHub image if configured
-
----
-
-## 📬 Contact / Contributions
-
-For questions, issues or contributions, reach out to:
-
-[@ad4johnson on GitHub](https://github.com/ad4johnson)
-
----
-
-© 2025 — Interstellar Route Planner  
-All Rights Reserved.
+This project was built as part of an academic research project on AI-powered anomaly detection in cloud-native environments.
