@@ -26,7 +26,8 @@ resource "aws_ecs_task_definition" "interstellar_task" {
         }
       ],
 
-      command = ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"],
+      command = ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+
 
       environment = [
         { name = "DB_HOST", value = var.db_host },

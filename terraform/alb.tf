@@ -35,7 +35,7 @@ resource "aws_lb" "interstellar_alb" {
 # =============================
 resource "aws_lb_target_group" "interstellar_tg" {
   name        = "interstellar-tg-${random_id.suffix.hex}"
-  port        = 8000
+  port        = 80
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = var.vpc_id
