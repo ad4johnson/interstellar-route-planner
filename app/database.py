@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ========================
-# DB Configuration via Env
+# DB Configuration
 # ========================
 def get_db_config():
     return {
@@ -17,22 +17,21 @@ def get_db_config():
         "user": os.getenv("DB_USER"),
         "password": os.getenv("DB_PASSWORD"),
         "host": os.getenv("DB_HOST"),
-        "port": os.getenv("DB_PORT", "5432"),  # Default PostgreSQL port
+        "port": os.getenv("DB_PORT", "5432"),
     }
 
 # ========================
-# Establish DB Connection
+# DB Connection Helper
 # ========================
 def get_db_connection():
     """
-    Create and return a new DB connection using environment variables.
-    Raises HTTPException if connection fails.
+    Establish and return a new DB connection.
+    Raises HTTPException on failure.
     """
+    config = get_db_config()
     try:
-        config = get_db_config()
         print(f"🔌 Connecting to DB at {config['host']}:{config['port']} as {config['user']}")
-        conn = psycopg2.connect(**config)
-        return conn
+        return psycopg2.connect(**config)
     except psycopg2.OperationalError as e:
         print(f"❌ OperationalError: {e}")
         raise HTTPException(status_code=500, detail=f"Database connection failed: {e}")
@@ -41,46 +40,39 @@ def get_db_connection():
         raise HTTPException(status_code=500, detail=f"Unexpected DB error: {e}")
 
 # ========================
-# Query: Fetch All Gates
+# Query Helpers
 # ========================
 def get_gates_from_db():
     """
-    Fetch all gates from the database.
-    Returns a dictionary like:
-    {
-        "A1": {"name": "Alpha", "connections": {"B1": 3, "C1": 5}},
-        ...
-    }
+    Fetch and return all gates from the database in structured dict format.
     """
+    query = "SELECT id, name, connections FROM gate;"
+    
     try:
         conn = get_db_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT id, name, connections FROM gate;")
-        rows = cur.fetchall()
+        with conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query)
+                rows = cur.fetchall()
 
         gates = {}
+
         for row in rows:
             gate_id = row["id"]
             name = row["name"]
             raw_connections = row["connections"]
 
             try:
-                parsed_connections = (
-                    json.loads(raw_connections)
-                    if isinstance(raw_connections, str)
-                    else raw_connections
+                connections_data = (
+                    json.loads(raw_connections) if isinstance(raw_connections, str) else raw_connections
                 )
                 gates[gate_id] = {
                     "name": name,
-                    "connections": {
-                        conn["id"]: int(conn["hu"]) for conn in parsed_connections
-                    },
+                    "connections": {conn["id"]: int(conn["hu"]) for conn in connections_data},
                 }
             except Exception as parse_error:
                 print(f"⚠️ Skipped gate {gate_id} due to parse error: {parse_error}")
 
-        cur.close()
-        conn.close()
         return gates
 
     except psycopg2.Error as e:
@@ -89,5 +81,6 @@ def get_gates_from_db():
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
-    
-    print(f"✅ Connecting to DB @ {os.getenv('DB_HOST')}")
+    finally:
+        if conn:
+            conn.close()

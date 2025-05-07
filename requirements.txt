@@ -5,7 +5,7 @@ python-dotenv
 pytest
 prometheus-fastapi-instrumentator
 boto3
-scikit-learn==1.5.1
+scikit-learn==1.4.1.post1
 pandas==2.2.1
 numpy==1.26.4
 joblib==1.4.0

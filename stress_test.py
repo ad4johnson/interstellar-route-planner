@@ -10,9 +10,15 @@ load_dotenv()
 
 API = os.getenv("BASE_URL", "http://interstellar-alb-1254490069.us-east-1.elb.amazonaws.com")
 
+# ✅ Add session for HTTP connection pooling
+session = requests.Session()
+adapter = requests.adapters.HTTPAdapter(pool_connections=100, pool_maxsize=100)
+session.mount('http://', adapter)
+session.mount('https://', adapter)
+
 def hit_get_routes():
     try:
-        resp = requests.get(f"{API}/gates/G1/to/G9", timeout=5)
+        resp = session.get(f"{API}/gates/G1/to/G9", timeout=15)
         print(f"[{time.strftime('%H:%M:%S')}] [Route] Status: {resp.status_code}")
     except Exception as e:
         print(f"[{time.strftime('%H:%M:%S')}] Route error:", e)
@@ -20,7 +26,7 @@ def hit_get_routes():
 def trigger_anomaly():
     try:
         payload = {"values": [[random.uniform(0, 1) for _ in range(38)]]}
-        resp = requests.post(f"{API}/anomaly-detection", json=payload, timeout=5)
+        resp = session.post(f"{API}/anomaly-detection", json=payload, timeout=5)
         print(f"[{time.strftime('%H:%M:%S')}] [Anomaly] Status: {resp.status_code} {resp.json()}")
     except Exception as e:
         print(f"[{time.strftime('%H:%M:%S')}] Anomaly error:", e)

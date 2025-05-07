@@ -6,6 +6,10 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
+  - job_name: 'interstellar-api'
+    static_configs:
+      - targets: ['api.interstellar.local:8888']  # Local dev metrics (FastAPI)
+
   - job_name: 'interstellar-api-ecs'  # ECS ALB metrics (!!! UPDATE THIS)
     metrics_path: /metrics
     static_configs:

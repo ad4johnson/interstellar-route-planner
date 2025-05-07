@@ -15,7 +15,8 @@ from typing import List
 import numpy as np
 from dotenv import load_dotenv
 from prometheus_client import Gauge
-
+import time
+import traceback
 
 # ========================
 # Metrics & Monitoring
@@ -71,9 +72,12 @@ threading.Thread(target=anomaly_ping_loop, daemon=True).start()
 
 print("🚀 Application started with AnomalyDetector version: detect() present")
 
+
+
 # ========================
 # Database Connection
 # ========================
+
 def get_database_url():
     user = os.getenv("DB_USER")
     password = os.getenv("DB_PASSWORD")
@@ -84,12 +88,19 @@ def get_database_url():
 
 DATABASE_URL = os.getenv("DATABASE_URL", get_database_url())
 
-try:
-    conn = psycopg2.connect(DATABASE_URL)
-    cursor = conn.cursor()
-except OperationalError as e:
-    print("Database connection failed:", e)
-    cursor = None
+def get_db_cursor(retries=5, delay=5):
+    for attempt in range(retries):
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            cursor = conn.cursor()
+            return conn, cursor
+        except OperationalError as e:
+            print(f"DB connection attempt {attempt+1} failed: {e}")
+            time.sleep(delay)
+    return None, None
+
+# Initialize global database connection and cursor
+db_connection, cursor = get_db_cursor()
 
 # ========================
 # API Endpoints
@@ -98,13 +109,20 @@ except OperationalError as e:
 def root():
     return {"message": "Interstellar API is live!"}
 
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
-
 @app.get("/api")
 def api_root():
     return {"message": "Interstellar API is live!"}
+
+@app.get("/health")
+def health_check():
+    try:
+        if cursor:
+            cursor.execute("SELECT 1;")
+            return {"status": "healthy", "db": "connected"}
+        else:
+            return {"status": "healthy", "db": "disconnected"}
+    except Exception as e:
+        return {"status": "healthy", "db": f"error: {e}"}
 
 @app.get("/gates")
 def get_gates():
@@ -164,4 +182,4 @@ def debug_graph():
 # ========================
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, proxy_headers=True, forwarded_allow_ips="*")
