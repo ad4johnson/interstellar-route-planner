@@ -1,155 +1,218 @@
-# Interstellar Route Planner (AI-Powered + Cloud-Native)
+# 🚀 Interstellar Route Planner (AI-Powered + Cloud-Native)
 
 ![Grafana Dashboard](./images/monitoring_dashboard.png)
 
 > A production-ready, AI-enhanced FastAPI microservice powered by AWS ECS, RDS, Prometheus, and Grafana for route planning, anomaly detection, and real-time observability.
 
-## Overview
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Interstellar Route Planner is a cloud-native service designed to plan optimal space routes while leveraging AI anomaly detection to identify irregular inputs. This project was built for research and production-grade deployments with observability and resilience in mind.
+---
 
-**Core Features:**
+## 📚 Table of Contents
 
-* FastAPI backend for route and anomaly APIs
-* Machine Learning Anomaly Detection (IsolationForest model)
-* Prometheus metrics exposure (`/metrics`)
-* Grafana dashboards (preconfigured for monitoring)
-* AWS ECS (Fargate) deployment + RDS PostgreSQL
-* Local Docker Compose stack for testing
-* Stress testing script included
+- [Overview](#-overview)
+- [Features](#-features)
+- [Project Infrastructure Overview](#-project-infrastructure-overview)
+- [Architecture Diagram](#-architecture-diagram)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Monitoring](#monitoring-prometheus--grafana)
+- [AI Anomaly Detection](#ai-anomaly-detection)
+- [Destroy Cloud Infra](#destroy-cloud-infra)
+- [License](#license)
+- [Contributing](#contributing)
+- [Credits](#credits)
 
-## Architecture
+---
 
-```
-User -> API Gateway / ALB -> ECS (Fargate + Interstellar API)
-                                     |
-                                     v
-                              RDS PostgreSQL (AWS)
-                                     |
-                                     v
-  Prometheus -> Grafana (Anomaly, Request, Resource Metrics)
-```
+## 📦 Overview
 
-* ECS Fargate: Runs the Dockerized Interstellar app
-* RDS PostgreSQL: Stores route data and logs
-* Prometheus: Scrapes `/metrics` endpoint for monitoring
-* Grafana: Dashboards for anomaly signals, API performance, DB health, CPU/MEM usage
+The Interstellar Route Planner is a scalable, observable, and intelligent API platform designed to plan routes in space with AI-driven anomaly detection.  
+Built for the cloud with modern DevOps practices, it ensures robust service delivery, monitoring, and continuous integration.
 
-## Project structure
+---
 
-```
+## 🛠️ Features
+
+✅ FastAPI backend serving real-time route planning API  
+✅ Integrated Anomaly Detection using trained ML model (.pkl)  
+✅ CI/CD with GitHub Actions for automated deployment  
+✅ AWS Fargate based microservice deployment  
+✅ PostgreSQL via Amazon RDS for durable data storage  
+✅ API Gateway + ALB for public routing  
+✅ Prometheus + Grafana dashboards for real-time monitoring  
+✅ S3 bucket for storage/logging  
+✅ Secrets and configs managed securely via AWS SSM Parameter Store
+
+---
+
+## 📊 Project Infrastructure Overview
+
+The Interstellar Route Planner leverages modern cloud and DevOps architecture to ensure scalability, reliability, and observability.
+
+**Core Components**:
+
+- **GitHub Actions** → CI/CD pipeline
+- **ALB & API Gateway** → Load balancing and routing
+- **ECS Fargate** → Compute (Interstellar API + Anomaly Detection)
+- **Amazon RDS** → PostgreSQL backend
+- **Prometheus & Grafana** → Monitoring and alerting
+- **S3 Bucket** → Storage of logs and backups
+- **IAM Roles & SSM Parameter Store** → Security and configuration
+- **AI ML Model** → Anomaly Detection (Isolation Forest)
+
+---
+
+### 📌 Architecture Diagram
+
+[🖼️ Click here to view the Interstellar Infrastructure Diagram](./images/infra_diagram.png)
+
+> Visualises how all components interact in the production deployment.
+
+---
+
+## 📁 Project Structure
+
 ├── app/
-│   ├── anomaly_detection/
-│   ├── database.py
-│   ├── main.py
+│ ├── anomaly_detection/
+│ ├── database.py
+│ ├── main.py
 ├── docker-compose.yml
 ├── terraform/
 ├── stress_test.py
 ├── models/
-│   └── anomaly_detector.pkl
+│ └── anomaly_detector.pkl
 ├── monitoring/
-│   └── prometheus.yml
+│ └── prometheus.yml
 └── README.md
-```
 
-## Getting Started
+
+---
+
+## 🚀 Getting Started
 
 ### Requirements
 
-* Docker + Docker Compose
-* Terraform
-* AWS Account (for ECS + RDS deployment)
-* Python 3.9+
+- Docker + Docker Compose
+- Terraform
+- AWS Account (ECS + RDS + S3 + CloudWatch)
+- Python 3.9+
+
+---
 
 ### Local Development
 
 ```bash
 docker compose up --build
-```
 
-**Available at:**
+Local Endpoints:
 
-* API -> [http://localhost:8000/docs](http://localhost:8000/docs)
-* Prometheus -> [http://localhost:9090](http://localhost:9090)
-* Grafana -> [http://localhost:3000](http://localhost:3000) (admin/admin)
+    API → http://localhost:8000/docs
 
-### Stress Test (optional)
+    Prometheus → http://localhost:9090
 
-```bash
+    Grafana → http://localhost:3000 (admin/admin)
+
+---
+
+Stress Test (optional)
 python stress_test.py
-```
 
-### Cloud Deployment (Terraform)
+---
+Cloud Deployment (Terraform)
 
-Update `terraform/terraform.tfvars` with your values:
+Update terraform/terraform.tfvars:
 
-```hcl
 aws_region = "us-east-1"
 db_name    = "interstellar"
 ...
 container_image = "ad4johnson/interstellar-app:latest"
-```
 
-Then:
+---
+Deploy:
 
-```bash
 cd terraform
 terraform init
 terraform plan
 terraform apply
-```
 
 After apply, you will get the ALB public URL:
 
-```
-http://interstellar-alb-XXXX.elb.amazonaws.com
-```
-
-#### Access API
-
-```
 http://interstellar-alb-XXXX.elb.amazonaws.com/docs
 http://interstellar-alb-XXXX.elb.amazonaws.com/metrics
-```
 
-## Monitoring (Prometheus + Grafana)
+---
+📊 Monitoring (Prometheus + Grafana)
 
-Pre-configured dashboards provide:
+Pre-configured dashboards include:
 
-* Anomaly Detection Signal (from /metrics)
-* API Request Rates and Status
-* Resource Usage (CPU / MEM / DB Health)
-* Request Duration
+    Anomaly Detection Signal
 
-Grafana will automatically discover Prometheus data sources when using docker compose.
+    API Request Rates and Status
 
-## AI Anomaly Detection
+    Resource Usage (CPU / MEM / DB Health)
 
-* Isolation Forest Model (trained on simulated dataset)
-* `/anomaly-detection` POST endpoint
-* `anomaly_detected` metric exposed for Prometheus
+    Request Duration and Errors
 
-```bash
+Grafana automatically discovers Prometheus datasource when running locally.
+
+
+**🤖 AI Anomaly Detection**
+
+ML Model: Isolation Forest (Pre-trained .pkl model)
+
+Endpoint: /anomaly-detection
+
 curl -X POST http://localhost:8000/anomaly-detection \
     -H "Content-Type: application/json" \
     -d '{"values": [[0.5, 0.1, 0.8, ..., 0.3]]}'
-```
 
-## Destroy Cloud Infra
+curl -X POST http://localhost:8000/anomaly-detection \
+    -H "Content-Type: application/json" \
+    -d '{"values": [[0.5, 0.1, 0.8, ..., 0.3]]}'
 
-```bash
+**Response:**
+
+{
+  "anomalies_detected": true,
+  "anomaly_indices": [0]
+}
+
+---
+
+**Prometheus metrics:**
+
+anomaly_detected 0.0 / 1.0
+
+---
+**💣 Destroy Cloud Infra (optional)**
+
 cd terraform
 terraform destroy
-```
 
-## License
+---
+📄 **License**
 
 MIT License.
 
-## Contributing
+----
+
+**🤝 Contributing**
 
 Pull Requests and Issues are welcome.
 
-## Credits
+    Fork this repository
 
-This project was built as part of an academic research project on AI-powered anomaly detection in cloud-native environments.
+    Create a new branch (feature/my-feature)
+
+    Commit and push your changes
+
+    Open a Pull Request
+
+---
+
+**📬 Credits**
+
+Built and maintained by Ade Johnson
+
+    Created as part of an academic research project on AI-powered anomaly detection in cloud-native environments.
