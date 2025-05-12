@@ -1,7 +1,5 @@
 # 🚀 Interstellar Route Planner (AI-Powered + Cloud-Native)
 
-![Grafana Dashboard](./images/monitoring_dashboard.png)
-
 > A production-ready, AI-enhanced FastAPI microservice powered by AWS ECS, RDS, Prometheus, and Grafana for route planning, anomaly detection, and real-time observability.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -154,7 +152,7 @@ Pre-configured dashboards include:
 
     Request Duration and Errors
 
-Grafana automatically discovers Prometheus datasource when running locally.
+Grafana automatically discovers the Prometheus datasource when running locally.
 
 
 **🤖 AI Anomaly Detection**
