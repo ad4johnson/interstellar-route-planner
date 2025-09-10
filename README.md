@@ -61,32 +61,6 @@ The Interstellar Route Planner leverages modern cloud and DevOps architecture to
 
 ---
 
-### 📌 Architecture Diagram
-
-[🖼️ Click here to view the Interstellar Infrastructure Diagram](./interstellar-route-planner/diagrams/infra_diagram.png)
-
-> Visualises how all components interact in the production deployment.
-
----
-
-## 📁 Project Structure
-
-├── app/
-│ ├── anomaly_detection/
-│ ├── database.py
-│ ├── main.py
-├── docker-compose.yml
-├── terraform/
-├── stress_test.py
-├── models/
-│ └── anomaly_detector.pkl
-├── monitoring/
-│ └── prometheus.yml
-└── README.md
-
-
----
-
 ## 🚀 Getting Started
 
 ### Requirements
