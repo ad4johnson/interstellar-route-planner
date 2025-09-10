@@ -63,7 +63,7 @@ The Interstellar Route Planner leverages modern cloud and DevOps architecture to
 
 ### 📌 Architecture Diagram
 
-[🖼️ Click here to view the Interstellar Infrastructure Diagram](./images/infra_diagram.png)
+[🖼️ Click here to view the Interstellar Infrastructure Diagram](./interstellar-route-planner/diagrams/infra_diagram.png)
 
 > Visualises how all components interact in the production deployment.
 
