@@ -11,8 +11,6 @@
 - [Overview](#-overview)
 - [Features](#-features)
 - [Project Infrastructure Overview](#-project-infrastructure-overview)
-- [Architecture Diagram](#-architecture-diagram)
-- [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Monitoring](#monitoring-prometheus--grafana)
 - [AI Anomaly Detection](#ai-anomaly-detection)
