@@ -11,6 +11,7 @@
 - [Overview](#-overview)
 - [Features](#-features)
 - [Project Infrastructure Overview](#-project-infrastructure-overview)
+- [DNS Configuration (Cloudflare)](#-dns-configuration-cloudflare)
 - [Getting Started](#getting-started)
 - [Monitoring](#monitoring-prometheus--grafana)
 - [AI Anomaly Detection](#ai-anomaly-detection)
@@ -56,6 +57,43 @@ The Interstellar Route Planner leverages modern cloud and DevOps architecture to
 - **S3 Bucket** → Storage of logs and backups
 - **IAM Roles & SSM Parameter Store** → Security and configuration
 - **AI ML Model** → Anomaly Detection (Isolation Forest)
+- **Cloudflare DNS** → Domain routing and DDoS protection (Optional)
+
+---
+
+## 🌐 DNS Configuration (Cloudflare)
+
+You can optionally use **Cloudflare DNS** instead of AWS Route53 for your domain (`errandbridge.com`).
+
+### What Changes
+- DNS Provider: Route53 → Cloudflare
+- Nameservers: AWS nameservers → Cloudflare nameservers
+
+### What Stays the Same
+- Application code, ALB, ECS, RDS, S3, and all infrastructure remain unchanged
+- Zero downtime migration
+- Fully reversible (5-minute rollback)
+
+### Quick Setup
+1. Create Cloudflare account at https://dash.cloudflare.com/sign-up
+2. Add domain `errandbridge.com` to Cloudflare
+3. Update nameservers at your registrar to Cloudflare's nameservers
+4. Create CNAME record in Cloudflare: `api` → ALB DNS
+5. Wait 15-60 minutes for DNS propagation
+
+### Get ALB DNS Name
+```bash
+cd terraform/
+terraform output alb_dns_name
+# Use this value as CNAME target in Cloudflare
+```
+
+### Benefits
+✅ Better DNS performance and propagation  
+✅ Built-in DDoS protection  
+✅ Free WAF and security features  
+✅ Easier DNS management UI  
+✅ Email routing capabilities
 
 ---
 
